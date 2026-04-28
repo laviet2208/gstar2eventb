@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="eventb" nsURI="http://www.example.org/eventb" nsPrefix="eventb">
+  <eClassifiers xsi:type="ecore:EClass" name="EventBObject" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="annotations" upperBound="-1"
+        eType="#//Annotation" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Annotation" eSuperTypes="#//EventBObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="source" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="details" upperBound="-1"
+        eType="#//StringToStringMapEntry" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StringToStringMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Attribute" eSuperTypes="#//EventBObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StringToAttributeMapEntry" instanceClassName="java.util.Map$Entry">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="#//Attribute"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EventBElement" abstract="true" eSuperTypes="#//EventBObject">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="reference" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="internalId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="generated" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="localGenerated" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="attributes" upperBound="-1"
+        eType="#//StringToAttributeMapEntry" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EventBNamedCommentedElement" abstract="true"
+      eSuperTypes="#//EventBElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="comment" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EventBDerived" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="theorem" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EventBNamedCommentedPredicateElement"
+      abstract="true" eSuperTypes="#//EventBNamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="predicate" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EventBNamedCommentedDerivedPredicateElement"
+      abstract="true" eSuperTypes="#//EventBNamedCommentedPredicateElement #//EventBDerived"/>
+  <eClassifiers xsi:type="ecore:EClass" name="EventBNamedCommentedActionElement" abstract="true"
+      eSuperTypes="#//EventBNamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="action" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="EventBNamedCommentedComponentElement"
+      abstract="true" eSuperTypes="#//EventBNamedCommentedElement"/>
+
+  <!-- ===== Rodin/Event-B convergence support (for liveness via PO: variant + event status) ===== -->
+  <eClassifiers xsi:type="ecore:EEnum" name="EventStatus">
+    <eLiterals name="ordinary" value="0" literal="ordinary"/>
+    <eLiterals name="anticipated" value="1" literal="anticipated"/>
+    <eLiterals name="convergent" value="2" literal="convergent"/>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Project" eSuperTypes="#//EventBNamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="components" upperBound="-1"
+        eType="#//EventBNamedCommentedComponentElement" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Context" eSuperTypes="#//EventBNamedCommentedComponentElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="axioms" upperBound="-1"
+        eType="#//Axiom" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Machine" eSuperTypes="#//EventBNamedCommentedComponentElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sees" upperBound="-1" eType="#//Context"/>
+    <!-- Variant expression (ASCII allowed; normalize later if needed) -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="variant"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
+        eType="#//Variable" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="invariants" upperBound="-1"
+        eType="#//Invariant" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="events" upperBound="-1"
+        eType="#//Event" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Variable" eSuperTypes="#//EventBNamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Axiom" eSuperTypes="#//EventBNamedCommentedDerivedPredicateElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Invariant" eSuperTypes="#//EventBNamedCommentedDerivedPredicateElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Event" eSuperTypes="#//EventBNamedCommentedElement">
+    <!-- Rodin convergence status: ordinary | anticipated | convergent -->
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status" eType="#//EventStatus"
+        defaultValueLiteral="ordinary"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="guards" upperBound="-1"
+        eType="#//Guard" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actions" upperBound="-1"
+        eType="#//Action" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Guard" eSuperTypes="#//EventBNamedCommentedDerivedPredicateElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="#//EventBNamedCommentedActionElement"/>
+</ecore:EPackage>
