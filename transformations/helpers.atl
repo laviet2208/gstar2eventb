@@ -1,0 +1,421 @@
+library helper;
+
+helper def : rootModel : GSR!GStarModel =
+    GSR!GStarModel.allInstances()->first();
+
+helper def : emptyString : String = '';
+
+helper def : defaultProjectName : String = 'gstar_project';
+
+helper def : defaultContextName : String = 'domain';
+
+helper def : truePredicate : String = 'TRUE';
+
+helper def : skipAction : String = 'skip';
+
+helper def : boolSet : String = 'BOOL';
+
+helper def : intSet : String = 'INT';
+
+helper def : stringSet : String = 'STRING';
+
+helper def : normalizeName(s : String) : String =
+    if s.oclIsUndefined() or s = '' then
+        'unnamed'
+    else
+        s
+    endif;
+
+helper def : safeConcat(prefix : String, name : String) : String =
+    prefix + '_' + thisModule.normalizeName(name);
+
+helper context GSR!GStarElement def : effectiveName : String =
+    if not self.id.oclIsUndefined() and self.id <> '' then
+        thisModule.normalizeName(self.id)
+    else
+        thisModule.normalizeName(self.name)
+    endif;
+
+helper context GSR!GStarElement def : readableName : String =
+    if not self.name.oclIsUndefined() and self.name <> '' then
+        thisModule.normalizeName(self.name)
+    else
+        self.effectiveName
+    endif;
+
+helper context GSR!GStarModel def : projectName : String =
+    thisModule.safeConcat('P', thisModule.defaultProjectName);
+
+helper context GSR!GStarModel def : contextName : String =
+    thisModule.safeConcat('C', thisModule.defaultContextName);
+
+helper context GSR!Actor def : isSystemActor : Boolean =
+    self.isEnv = false;
+
+helper context GSR!Actor def : isEnvironmentActor : Boolean =
+    self.isEnv = true;
+
+helper context GSR!Actor def : machineName : String =
+    thisModule.safeConcat('M', self.effectiveName);
+
+helper context GSR!Actor def : ownedElements : Sequence(GSR!IntentionalElement) =
+    GSR!Wants.allInstances()
+        ->select(w | w.actor = self)
+        ->collect(w | w.element)
+        ->asSequence();
+
+helper context GSR!Actor def : ownedGoals : Sequence(GSR!Goal) =
+    self.ownedElements
+        ->select(e | e.oclIsKindOf(GSR!Goal))
+        ->collect(e | e.oclAsType(GSR!Goal))
+        ->asSequence();
+
+helper context GSR!Actor def : ownedMaintainGoals : Sequence(GSR!Goal) =
+    self.ownedGoals
+        ->select(g | g.isMaintainGoal)
+        ->asSequence();
+
+helper context GSR!Actor def : ownedAchieveGoals : Sequence(GSR!Goal) =
+    self.ownedGoals
+        ->select(g | g.isAchieveGoal)
+        ->asSequence();
+
+helper context GSR!Actor def : ownedOperations : Sequence(GSR!Operation) =
+    self.ownedElements
+        ->select(e | e.oclIsKindOf(GSR!Operation))
+        ->collect(e | e.oclAsType(GSR!Operation))
+        ->asSequence();
+
+helper context GSR!Actor def : ownedDomainAssumptions : Sequence(GSR!DomainAssumption) =
+    self.ownedElements
+        ->select(e | e.oclIsKindOf(GSR!DomainAssumption))
+        ->collect(e | e.oclAsType(GSR!DomainAssumption))
+        ->asSequence();
+
+helper context GSR!Actor def : ownedObstacles : Sequence(GSR!Obstacle) =
+    self.ownedElements
+        ->select(e | e.oclIsKindOf(GSR!Obstacle))
+        ->collect(e | e.oclAsType(GSR!Obstacle))
+        ->asSequence();
+
+helper context GSR!Actor def : environmentDependencies : Sequence(GSR!Dependency) =
+    GSR!Dependency.allInstances()
+        ->select(d | d.depender = self and d.dependee.isEnvironmentActor)
+        ->asSequence();
+
+helper context GSR!Goal def : isMaintainGoal : Boolean =
+    self.mode = #MAINTAIN;
+
+helper context GSR!Goal def : isAchieveGoal : Boolean =
+    self.mode = #ACHIEVE;
+
+helper context GSR!Goal def : variableName : String =
+    thisModule.safeConcat('v', self.effectiveName);
+
+helper context GSR!Goal def : invariantName : String =
+    thisModule.safeConcat('inv', self.effectiveName);
+
+helper context GSR!Goal def : typingInvariantName : String =
+    thisModule.safeConcat('type', self.effectiveName);
+
+helper context GSR!Goal def : booleanTypingPredicate : String =
+    self.variableName + ' : ' + thisModule.boolSet;
+
+helper context GSR!Goal def : goalPredicate : String =
+    if self.spec.oclIsUndefined() then
+        self.variableName + ' = TRUE'
+    else
+        self.spec.toPredicate
+    endif;
+
+helper context GSR!Resource def : constantName : String =
+    thisModule.safeConcat('c', self.effectiveName);
+
+helper context GSR!Resource def : typeAxiomName : String =
+    thisModule.safeConcat('axm_type', self.effectiveName);
+
+helper context GSR!Resource def : resourceAxiomPredicate : String =
+    if self.resourceType.oclIsUndefined() or self.resourceType = '' then
+        self.constantName + ' : ' + thisModule.stringSet
+    else
+        self.constantName + ' : ' + thisModule.normalizeName(self.resourceType)
+    endif;
+
+helper context GSR!DomainAssumption def : isStaticAssumption : Boolean =
+    true;
+
+helper context GSR!DomainAssumption def : axiomName : String =
+    thisModule.safeConcat('axm', self.effectiveName);
+
+helper context GSR!DomainAssumption def : invariantName : String =
+    thisModule.safeConcat('inv_assumption', self.effectiveName);
+
+helper context GSR!DomainAssumption def : guardName : String =
+    thisModule.safeConcat('grd_assumption', self.effectiveName);
+
+helper context GSR!DomainAssumption def : assumptionPredicate : String =
+    if self.spec.oclIsUndefined() then
+        thisModule.truePredicate
+    else
+        self.spec.toPredicate
+    endif;
+
+helper context GSR!Obstacle def : obstaclePredicate : String =
+    if self.spec.oclIsUndefined() then
+        thisModule.truePredicate
+    else
+        self.spec.toPredicate
+    endif;
+
+helper context GSR!Obstacle def : negatedObstaclePredicate : String =
+    'not(' + self.obstaclePredicate + ')';
+
+helper context GSR!Obstacle def : hinderingGuardName : String =
+    thisModule.safeConcat('grd_not_obstacle', self.effectiveName);
+
+helper context GSR!Obstacle def : occurrenceGuardName : String =
+    thisModule.safeConcat('grd_obstacle', self.effectiveName);
+
+helper context GSR!Obstacle def : handlingEventName : String =
+    thisModule.safeConcat('handle', self.effectiveName);
+
+helper context GSR!Obstacle def : handlingActionName : String =
+    thisModule.safeConcat('act_handle', self.effectiveName);
+
+helper context GSR!Obstacle def : handlingAssignment : String =
+    thisModule.skipAction;
+
+helper context GSR!Operation def : eventName : String =
+    thisModule.safeConcat('op', self.effectiveName);
+
+helper context GSR!Operation def : guardName : String =
+    thisModule.safeConcat('grd', self.effectiveName);
+
+helper context GSR!Operation def : actionName : String =
+    thisModule.safeConcat('act', self.effectiveName);
+
+helper context GSR!Operation def : statusVariableName : String =
+    thisModule.safeConcat('done', self.effectiveName);
+
+helper context GSR!Operation def : statusTypingInvariantName : String =
+    thisModule.safeConcat('type_done', self.effectiveName);
+
+helper context GSR!Operation def : statusTypingPredicate : String =
+    self.statusVariableName + ' : ' + thisModule.boolSet;
+
+helper context GSR!Operation def : statusActionName : String =
+    thisModule.safeConcat('act_done', self.effectiveName);
+
+helper context GSR!Operation def : statusAssignment : String =
+    self.statusVariableName + ' := TRUE';
+
+helper context GSR!Operation def : preconditionPredicate : String =
+    if self.preCondition.oclIsUndefined() then
+        thisModule.truePredicate
+    else
+        self.preCondition.toPredicate
+    endif;
+
+helper context GSR!Operation def : postconditionAssignment : String =
+    if self.postCondition.oclIsUndefined() then
+        thisModule.skipAction
+    else
+        self.postCondition.toAssignment
+    endif;
+
+helper context GSR!Operation def : relatedDomainAssumptions : Sequence(GSR!DomainAssumption) =
+    Sequence {};
+
+helper context GSR!Operation def : relatedObstacles : Sequence(GSR!Obstacle) =
+    GSR!Obstructs.allInstances()
+        ->select(o | o.obstructed = self)
+        ->collect(o | o.obstacle)
+        ->asSequence();
+
+helper context GSR!ModTarget def : actionName : String =
+    thisModule.safeConcat('act_mod', self.effectiveName);
+
+helper context GSR!ModTarget def : targetName : String =
+    if self.attr.oclIsUndefined() or self.attr = '' then
+        thisModule.normalizeName(self.var.varName)
+    else
+        thisModule.normalizeName(self.var.varName) + '_' + thisModule.normalizeName(self.attr)
+    endif;
+
+helper context GSR!ModTarget def : assignmentText : String =
+    self.targetName + ' := ' + self.targetName;
+
+helper context GSR!Dependency def : invariantName : String =
+    thisModule.safeConcat('inv_dep', self.effectiveName);
+
+helper context GSR!Dependency def : dependencyPredicate : String =
+    thisModule.safeConcat('dep', self.depender.effectiveName) + '_' + thisModule.safeConcat('on', self.dependee.effectiveName) + ' = TRUE';
+
+helper context GSR!Dependency def : isRelevantToActor(a : GSR!Actor) : Boolean =
+    self.depender = a or self.dependee = a;
+
+helper context GSR!Dependency def : environmentEventName : String =
+    thisModule.safeConcat('env', self.effectiveName);
+
+helper context GSR!Dependency def : environmentGuardName : String =
+    thisModule.safeConcat('grd_env', self.effectiveName);
+
+helper context GSR!Dependency def : environmentGuardPredicate : String =
+    if self.dependum.spec.oclIsUndefined() then
+        thisModule.truePredicate
+    else
+        self.dependum.spec.toPredicate
+    endif;
+
+helper context GSR!Dependency def : environmentActionName : String =
+    thisModule.safeConcat('act_env', self.effectiveName);
+
+helper context GSR!Dependency def : environmentActionAssignment : String =
+    thisModule.skipAction;
+
+helper context GSR!Refinement def : invariantName : String =
+    thisModule.safeConcat('inv_ref', self.effectiveName);
+
+helper context GSR!Refinement def : isRelevantToActor(a : GSR!Actor) : Boolean =
+    GSR!Wants.allInstances()
+        ->exists(w | w.actor = a and w.element = self.parent);
+
+helper context GSR!Refinement def : refinementPredicate : String =
+    self.parent.statePredicate;
+
+helper context GSR!IntentionalElement def : statePredicate : String =
+    if self.oclIsKindOf(GSR!Goal) then
+        self.oclAsType(GSR!Goal).variableName + ' = TRUE'
+    else
+        thisModule.safeConcat('state', self.effectiveName) + ' = TRUE'
+    endif;
+
+helper context GSR!TemporalVariable def : constantName : String =
+    thisModule.safeConcat('tv', self.effectiveName);
+
+helper context GSR!TemporalVariable def : variableName : String =
+    thisModule.safeConcat('v_tv', self.effectiveName);
+
+helper context GSR!TemporalVariable def : contextTypingAxiomName : String =
+    thisModule.safeConcat('axm_tv_type', self.effectiveName);
+
+helper context GSR!TemporalVariable def : machineTypingInvariantName : String =
+    thisModule.safeConcat('type_tv', self.effectiveName);
+
+helper context GSR!TemporalVariable def : requiresStateVariable : Boolean =
+    self.kind = #INTERNAL or self.kind = #OUTPUT;
+
+helper context GSR!TemporalVariable def : normalizedDataType : String =
+    if self.dataType.oclIsUndefined() or self.dataType = '' then
+        thisModule.boolSet
+    else
+        thisModule.normalizeName(self.dataType)
+    endif;
+
+helper context GSR!TemporalVariable def : contextTypingPredicate : String =
+    self.constantName + ' : ' + self.normalizedDataType;
+
+helper context GSR!TemporalVariable def : machineTypingPredicate : String =
+    self.variableName + ' : ' + self.normalizedDataType;
+
+helper context GSR!Query def : toPredicate : String =
+    if self.oclIsUndefined() or self.expr.oclIsUndefined() then
+        thisModule.truePredicate
+    else
+        self.expr.toPredicate
+    endif;
+
+helper context GSR!Query def : toAssignment : String =
+    if self.oclIsUndefined() or self.expr.oclIsUndefined() then
+        thisModule.skipAction
+    else
+        self.expr.toAssignment
+    endif;
+
+helper context GSR!Expr def : toPredicate : String =
+    if self.oclIsKindOf(GSR!And) then
+        '(' + self.oclAsType(GSR!BinaryExpr).left.toPredicate + ' & ' + self.oclAsType(GSR!BinaryExpr).right.toPredicate + ')'
+    else if self.oclIsKindOf(GSR!Or) then
+        '(' + self.oclAsType(GSR!BinaryExpr).left.toPredicate + ' or ' + self.oclAsType(GSR!BinaryExpr).right.toPredicate + ')'
+    else if self.oclIsKindOf(GSR!Implies) then
+        '(' + self.oclAsType(GSR!BinaryExpr).left.toPredicate + ' => ' + self.oclAsType(GSR!BinaryExpr).right.toPredicate + ')'
+    else if self.oclIsKindOf(GSR!Not) then
+        'not(' + self.oclAsType(GSR!UnaryExpr).operand.toPredicate + ')'
+    else if self.oclIsKindOf(GSR!RelOp) then
+        '(' + self.oclAsType(GSR!RelOp).left.toPredicate + ' ' + self.oclAsType(GSR!RelOp).operatorText + ' ' + self.oclAsType(GSR!RelOp).right.toPredicate + ')'
+    else if self.oclIsKindOf(GSR!VarRef) then
+        self.oclAsType(GSR!VarRef).referenceText
+    else if self.oclIsKindOf(GSR!AttrRef) then
+        self.oclAsType(GSR!AttrRef).referenceText
+    else if self.oclIsKindOf(GSR!Const) then
+        self.oclAsType(GSR!Const).literalText
+    else
+        thisModule.normalizeName(self.name)
+    endif endif endif endif endif endif endif endif;
+
+helper context GSR!Expr def : toAssignment : String =
+    if self.oclIsKindOf(GSR!RelOp) then
+        self.oclAsType(GSR!RelOp).assignmentText
+    else
+        thisModule.skipAction
+    endif;
+
+helper context GSR!RelOp def : operatorText : String =
+    if self.op = #EQ then
+        '='
+    else if self.op = #NEQ then
+        '/='
+    else if self.op = #LT then
+        '<'
+    else if self.op = #LE then
+        '<='
+    else if self.op = #GT then
+        '>'
+    else if self.op = #GE then
+        '>='
+    else
+        '='
+    endif endif endif endif endif endif;
+
+helper context GSR!RelOp def : assignmentText : String =
+    if self.op = #EQ then
+        self.left.lvalueText + ' := ' + self.right.toPredicate
+    else
+        thisModule.skipAction
+    endif;
+
+helper context GSR!Expr def : lvalueText : String =
+    if self.oclIsKindOf(GSR!VarRef) then
+        self.oclAsType(GSR!VarRef).referenceText
+    else if self.oclIsKindOf(GSR!AttrRef) then
+        self.oclAsType(GSR!AttrRef).referenceText
+    else
+        self.toPredicate
+    endif endif;
+
+helper context GSR!VarRef def : referenceText : String =
+    if self.isPrime then
+        thisModule.normalizeName(self.var.varName) + '_post'
+    else
+        thisModule.normalizeName(self.var.varName)
+    endif;
+
+helper context GSR!AttrRef def : referenceText : String =
+    if self.isPrime then
+        thisModule.normalizeName(self.var.varName) + '_' + thisModule.normalizeName(self.attr) + '_post'
+    else
+        thisModule.normalizeName(self.var.varName) + '_' + thisModule.normalizeName(self.attr)
+    endif;
+
+helper context GSR!Const def : literalText : String =
+    if self.type = #STRING then
+        thisModule.normalizeName(self.literal)
+    else if self.type = #BOOL then
+        if self.literal = 'true' or self.literal = 'TRUE' then
+            'TRUE'
+        else
+            'FALSE'
+        endif
+    else
+        self.literal
+    endif endif;
