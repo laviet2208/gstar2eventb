@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gstar:GStarModel xmlns:gstar="http://example.org/gstar" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmi:version="2.0">
+  <nodes xsi:type="gstar:Agent" id="AG_PUMP_CONTROLLER" name="PumpController" isEnv="false"/>
+  <nodes xsi:type="gstar:Agent" id="AG_ALARM_CONTROLLER" name="AlarmController" isEnv="false"/>
+  <nodes xsi:type="gstar:Agent" id="AG_HIGH_WATER_SENSOR" name="HighWaterSensor" isEnv="true"/>
+  <nodes xsi:type="gstar:Agent" id="AG_LOW_WATER_SENSOR" name="LowWaterSensor" isEnv="true"/>
+  <nodes xsi:type="gstar:Agent" id="AG_METHANE_SENSOR" name="MethaneSensor" isEnv="true"/>
+  <nodes xsi:type="gstar:Goal" id="G_SAFE_MINE" name="SafeMine" mode="MAINTAIN">
+    <spec id="Q_G_SAFE_MINE" name="Spec G_SAFE_MINE">
+      <snapshot id="Q_G_SAFE_MINE_SN" name="Q_G_SAFE_MINE_S">
+        <objVars id="Q_G_SAFE_MINE_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="Q_G_SAFE_MINE_E" name="Q_G_SAFE_MINE_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="Q_G_SAFE_MINE_EL" name="m.mine_cond" var="Q_G_SAFE_MINE_OV" attr="mine_cond"/>
+        <right xsi:type="gstar:Const" id="Q_G_SAFE_MINE_ER" name="safe" type="STRING" literal="safe"/>
+      </expr>
+    </spec>
+  </nodes>
+  <links xsi:type="gstar:Wants" id="W_G_SAFE_MINE" name="Owner SafeMine" actor="AG_PUMP_CONTROLLER" element="G_SAFE_MINE"/>
+  <nodes xsi:type="gstar:Goal" id="G_NO_FLOODING" name="NoFlooding" mode="MAINTAIN">
+    <spec id="Q_G_NO_FLOODING" name="Spec G_NO_FLOODING">
+      <snapshot id="Q_G_NO_FLOODING_SN" name="Q_G_NO_FLOODING_S">
+        <objVars id="Q_G_NO_FLOODING_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="Q_G_NO_FLOODING_E" name="Q_G_NO_FLOODING_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="Q_G_NO_FLOODING_EL" name="m.flood_cond" var="Q_G_NO_FLOODING_OV" attr="flood_cond"/>
+        <right xsi:type="gstar:Const" id="Q_G_NO_FLOODING_ER" name="safe" type="STRING" literal="safe"/>
+      </expr>
+    </spec>
+  </nodes>
+  <links xsi:type="gstar:Wants" id="W_G_NO_FLOODING" name="Owner NoFlooding" actor="AG_PUMP_CONTROLLER" element="G_NO_FLOODING"/>
+  <nodes xsi:type="gstar:Goal" id="G_NO_PUMP_DAMAGED" name="NoPumpDamaged" mode="MAINTAIN">
+    <spec id="Q_G_NO_PUMP_DAMAGED" name="Spec G_NO_PUMP_DAMAGED">
+      <snapshot id="Q_G_NO_PUMP_DAMAGED_SN" name="Q_G_NO_PUMP_DAMAGED_S">
+        <objVars id="Q_G_NO_PUMP_DAMAGED_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="Q_G_NO_PUMP_DAMAGED_E" name="Q_G_NO_PUMP_DAMAGED_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="Q_G_NO_PUMP_DAMAGED_EL" name="m.pump_cond" var="Q_G_NO_PUMP_DAMAGED_OV" attr="pump_cond"/>
+        <right xsi:type="gstar:Const" id="Q_G_NO_PUMP_DAMAGED_ER" name="good" type="STRING" literal="good"/>
+      </expr>
+    </spec>
+  </nodes>
+  <links xsi:type="gstar:Wants" id="W_G_NO_PUMP_DAMAGED" name="Owner NoPumpDamaged" actor="AG_PUMP_CONTROLLER" element="G_NO_PUMP_DAMAGED"/>
+  <nodes xsi:type="gstar:Goal" id="G_NO_EXPLOSION" name="NoExplosion" mode="MAINTAIN">
+    <spec id="Q_G_NO_EXPLOSION" name="Spec G_NO_EXPLOSION">
+      <snapshot id="Q_G_NO_EXPLOSION_SN" name="Q_G_NO_EXPLOSION_S">
+        <objVars id="Q_G_NO_EXPLOSION_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="Q_G_NO_EXPLOSION_E" name="Q_G_NO_EXPLOSION_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="Q_G_NO_EXPLOSION_EL" name="m.explosion_cond" var="Q_G_NO_EXPLOSION_OV" attr="explosion_cond"/>
+        <right xsi:type="gstar:Const" id="Q_G_NO_EXPLOSION_ER" name="safe" type="STRING" literal="safe"/>
+      </expr>
+    </spec>
+  </nodes>
+  <links xsi:type="gstar:Wants" id="W_G_NO_EXPLOSION" name="Owner NoExplosion" actor="AG_PUMP_CONTROLLER" element="G_NO_EXPLOSION"/>
+  <nodes xsi:type="gstar:Goal" id="G_HIGH_WATER_DETECTED" name="HighWaterDetected" mode="ACHIEVE">
+    <spec id="Q_G_HIGH_WATER_DETECTED" name="Spec G_HIGH_WATER_DETECTED">
+      <snapshot id="Q_G_HIGH_WATER_DETECTED_SN" name="Q_G_HIGH_WATER_DETECTED_S">
+        <objVars id="Q_G_HIGH_WATER_DETECTED_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="Q_G_HIGH_WATER_DETECTED_E" name="Q_G_HIGH_WATER_DETECTED_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="Q_G_HIGH_WATER_DETECTED_EL" name="m.water_level" var="Q_G_HIGH_WATER_DETECTED_OV" attr="water_level"/>
+        <right xsi:type="gstar:Const" id="Q_G_HIGH_WATER_DETECTED_ER" name="high" type="STRING" literal="high"/>
+      </expr>
+    </spec>
+  </nodes>
+  <links xsi:type="gstar:Wants" id="W_G_HIGH_WATER_DETECTED" name="Owner HighWaterDetected" actor="AG_HIGH_WATER_SENSOR" element="G_HIGH_WATER_DETECTED"/>
+  <nodes xsi:type="gstar:Goal" id="G_LOW_WATER_DETECTED" name="LowWaterDetected" mode="ACHIEVE">
+    <spec id="Q_G_LOW_WATER_DETECTED" name="Spec G_LOW_WATER_DETECTED">
+      <snapshot id="Q_G_LOW_WATER_DETECTED_SN" name="Q_G_LOW_WATER_DETECTED_S">
+        <objVars id="Q_G_LOW_WATER_DETECTED_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="Q_G_LOW_WATER_DETECTED_E" name="Q_G_LOW_WATER_DETECTED_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="Q_G_LOW_WATER_DETECTED_EL" name="m.water_level" var="Q_G_LOW_WATER_DETECTED_OV" attr="water_level"/>
+        <right xsi:type="gstar:Const" id="Q_G_LOW_WATER_DETECTED_ER" name="low" type="STRING" literal="low"/>
+      </expr>
+    </spec>
+  </nodes>
+  <links xsi:type="gstar:Wants" id="W_G_LOW_WATER_DETECTED" name="Owner LowWaterDetected" actor="AG_LOW_WATER_SENSOR" element="G_LOW_WATER_DETECTED"/>
+  <nodes xsi:type="gstar:Goal" id="G_METHANE_DETECTED" name="MethaneDetected" mode="ACHIEVE">
+    <spec id="Q_G_METHANE_DETECTED" name="Spec G_METHANE_DETECTED">
+      <snapshot id="Q_G_METHANE_DETECTED_SN" name="Q_G_METHANE_DETECTED_S">
+        <objVars id="Q_G_METHANE_DETECTED_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="Q_G_METHANE_DETECTED_E" name="Q_G_METHANE_DETECTED_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="Q_G_METHANE_DETECTED_EL" name="m.methane" var="Q_G_METHANE_DETECTED_OV" attr="methane"/>
+        <right xsi:type="gstar:Const" id="Q_G_METHANE_DETECTED_ER" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <links xsi:type="gstar:Wants" id="W_G_METHANE_DETECTED" name="Owner MethaneDetected" actor="AG_METHANE_SENSOR" element="G_METHANE_DETECTED"/>
+  <nodes xsi:type="gstar:Operation" id="OP_PUMP_TURN_ON" name="PumpTurnOn">
+    <preCondition id="PRE_OP_PUMP_TURN_ON" name="Pre PumpTurnOn">
+      <snapshot id="PRE_OP_PUMP_TURN_ON_SN" name="PRE_OP_PUMP_TURN_ON_S">
+        <objVars id="PRE_OP_PUMP_TURN_ON_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:And" id="PRE_OP_PUMP_TURN_ON_E" name="PRE_OP_PUMP_TURN_ON_expr">
+        <left xsi:type="gstar:RelOp" id="PRE_OP_PUMP_TURN_ON_R1" name="PRE_OP_PUMP_TURN_ON_R1" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_PUMP_TURN_ON_R1L" name="m.water_level" var="PRE_OP_PUMP_TURN_ON_OV" attr="water_level"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_PUMP_TURN_ON_R1R" name="high" type="STRING" literal="high"/>
+        </left>
+        <right xsi:type="gstar:And" id="PRE_OP_PUMP_TURN_ON_A2" name="PRE_OP_PUMP_TURN_ON_A2">
+          <left xsi:type="gstar:RelOp" id="PRE_OP_PUMP_TURN_ON_R2" name="PRE_OP_PUMP_TURN_ON_R2" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_PUMP_TURN_ON_R2L" name="m.pump_ctrl" var="PRE_OP_PUMP_TURN_ON_OV" attr="pump_ctrl"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_PUMP_TURN_ON_R2R" name="off" type="STRING" literal="off"/>
+        </left>
+          <right xsi:type="gstar:RelOp" id="PRE_OP_PUMP_TURN_ON_R3" name="PRE_OP_PUMP_TURN_ON_R3" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_PUMP_TURN_ON_R3L" name="m.methane" var="PRE_OP_PUMP_TURN_ON_OV" attr="methane"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_PUMP_TURN_ON_R3R" name="FALSE" type="BOOL" literal="FALSE"/>
+        </right>
+        </right>
+      </expr>
+    </preCondition>
+    <postCondition id="POST_OP_PUMP_TURN_ON" name="Post PumpTurnOn">
+      <snapshot id="POST_OP_PUMP_TURN_ON_SN" name="POST_OP_PUMP_TURN_ON_S">
+        <objVars id="POST_OP_PUMP_TURN_ON_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="POST_OP_PUMP_TURN_ON_E" name="POST_OP_PUMP_TURN_ON_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="POST_OP_PUMP_TURN_ON_EL" name="m.pump_ctrl'" var="POST_OP_PUMP_TURN_ON_OV" attr="pump_ctrl" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="POST_OP_PUMP_TURN_ON_ER" name="on" type="STRING" literal="on"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_OP_PUMP_TURN_ON" name="mod_pump_ctrl" var="POST_OP_PUMP_TURN_ON_OV" attr="pump_ctrl"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_PUMP_TURN_OFF" name="PumpTurnOff">
+    <preCondition id="PRE_OP_PUMP_TURN_OFF" name="Pre PumpTurnOff">
+      <snapshot id="PRE_OP_PUMP_TURN_OFF_SN" name="PRE_OP_PUMP_TURN_OFF_S">
+        <objVars id="PRE_OP_PUMP_TURN_OFF_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:And" id="PRE_OP_PUMP_TURN_OFF_E" name="PRE_OP_PUMP_TURN_OFF_expr">
+        <left xsi:type="gstar:RelOp" id="PRE_OP_PUMP_TURN_OFF_R1" name="PRE_OP_PUMP_TURN_OFF_R1" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_PUMP_TURN_OFF_R1L" name="m.water_level" var="PRE_OP_PUMP_TURN_OFF_OV" attr="water_level"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_PUMP_TURN_OFF_R1R" name="low" type="STRING" literal="low"/>
+        </left>
+        <right xsi:type="gstar:RelOp" id="PRE_OP_PUMP_TURN_OFF_R2" name="PRE_OP_PUMP_TURN_OFF_R2" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_PUMP_TURN_OFF_R2L" name="m.pump_ctrl" var="PRE_OP_PUMP_TURN_OFF_OV" attr="pump_ctrl"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_PUMP_TURN_OFF_R2R" name="on" type="STRING" literal="on"/>
+        </right>
+      </expr>
+    </preCondition>
+    <postCondition id="POST_OP_PUMP_TURN_OFF" name="Post PumpTurnOff">
+      <snapshot id="POST_OP_PUMP_TURN_OFF_SN" name="POST_OP_PUMP_TURN_OFF_S">
+        <objVars id="POST_OP_PUMP_TURN_OFF_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="POST_OP_PUMP_TURN_OFF_E" name="POST_OP_PUMP_TURN_OFF_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="POST_OP_PUMP_TURN_OFF_EL" name="m.pump_ctrl'" var="POST_OP_PUMP_TURN_OFF_OV" attr="pump_ctrl" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="POST_OP_PUMP_TURN_OFF_ER" name="off" type="STRING" literal="off"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_OP_PUMP_TURN_OFF" name="mod_pump_ctrl" var="POST_OP_PUMP_TURN_OFF_OV" attr="pump_ctrl"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_PUMP_OFF_METHANE" name="PumpOffMethane">
+    <preCondition id="PRE_OP_PUMP_OFF_METHANE" name="Pre PumpOffMethane">
+      <snapshot id="PRE_OP_PUMP_OFF_METHANE_SN" name="PRE_OP_PUMP_OFF_METHANE_S">
+        <objVars id="PRE_OP_PUMP_OFF_METHANE_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:And" id="PRE_OP_PUMP_OFF_METHANE_E" name="PRE_OP_PUMP_OFF_METHANE_expr">
+        <left xsi:type="gstar:RelOp" id="PRE_OP_PUMP_OFF_METHANE_R1" name="PRE_OP_PUMP_OFF_METHANE_R1" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_PUMP_OFF_METHANE_R1L" name="m.methane" var="PRE_OP_PUMP_OFF_METHANE_OV" attr="methane"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_PUMP_OFF_METHANE_R1R" name="TRUE" type="BOOL" literal="TRUE"/>
+        </left>
+        <right xsi:type="gstar:RelOp" id="PRE_OP_PUMP_OFF_METHANE_R2" name="PRE_OP_PUMP_OFF_METHANE_R2" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_PUMP_OFF_METHANE_R2L" name="m.pump_ctrl" var="PRE_OP_PUMP_OFF_METHANE_OV" attr="pump_ctrl"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_PUMP_OFF_METHANE_R2R" name="on" type="STRING" literal="on"/>
+        </right>
+      </expr>
+    </preCondition>
+    <postCondition id="POST_OP_PUMP_OFF_METHANE" name="Post PumpOffMethane">
+      <snapshot id="POST_OP_PUMP_OFF_METHANE_SN" name="POST_OP_PUMP_OFF_METHANE_S">
+        <objVars id="POST_OP_PUMP_OFF_METHANE_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="POST_OP_PUMP_OFF_METHANE_E" name="POST_OP_PUMP_OFF_METHANE_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="POST_OP_PUMP_OFF_METHANE_EL" name="m.pump_ctrl'" var="POST_OP_PUMP_OFF_METHANE_OV" attr="pump_ctrl" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="POST_OP_PUMP_OFF_METHANE_ER" name="off" type="STRING" literal="off"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_OP_PUMP_OFF_METHANE" name="mod_pump_ctrl" var="POST_OP_PUMP_OFF_METHANE_OV" attr="pump_ctrl"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_ALARM_ON_METHANE" name="AlarmOnMethane">
+    <preCondition id="PRE_OP_ALARM_ON_METHANE" name="Pre AlarmOnMethane">
+      <snapshot id="PRE_OP_ALARM_ON_METHANE_SN" name="PRE_OP_ALARM_ON_METHANE_S">
+        <objVars id="PRE_OP_ALARM_ON_METHANE_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:And" id="PRE_OP_ALARM_ON_METHANE_E" name="PRE_OP_ALARM_ON_METHANE_expr">
+        <left xsi:type="gstar:RelOp" id="PRE_OP_ALARM_ON_METHANE_R1" name="PRE_OP_ALARM_ON_METHANE_R1" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_ALARM_ON_METHANE_R1L" name="m.methane" var="PRE_OP_ALARM_ON_METHANE_OV" attr="methane"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_ALARM_ON_METHANE_R1R" name="TRUE" type="BOOL" literal="TRUE"/>
+        </left>
+        <right xsi:type="gstar:RelOp" id="PRE_OP_ALARM_ON_METHANE_R2" name="PRE_OP_ALARM_ON_METHANE_R2" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="PRE_OP_ALARM_ON_METHANE_R2L" name="m.alarm_ctrl" var="PRE_OP_ALARM_ON_METHANE_OV" attr="alarm_ctrl"/>
+          <right xsi:type="gstar:Const" id="PRE_OP_ALARM_ON_METHANE_R2R" name="off" type="STRING" literal="off"/>
+        </right>
+      </expr>
+    </preCondition>
+    <postCondition id="POST_OP_ALARM_ON_METHANE" name="Post AlarmOnMethane">
+      <snapshot id="POST_OP_ALARM_ON_METHANE_SN" name="POST_OP_ALARM_ON_METHANE_S">
+        <objVars id="POST_OP_ALARM_ON_METHANE_OV" name="m" varName="m" type="Mine"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="POST_OP_ALARM_ON_METHANE_E" name="POST_OP_ALARM_ON_METHANE_expr" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="POST_OP_ALARM_ON_METHANE_EL" name="m.alarm_ctrl'" var="POST_OP_ALARM_ON_METHANE_OV" attr="alarm_ctrl" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="POST_OP_ALARM_ON_METHANE_ER" name="on" type="STRING" literal="on"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_OP_ALARM_ON_METHANE" name="mod_alarm_ctrl" var="POST_OP_ALARM_ON_METHANE_OV" attr="alarm_ctrl"/>
+  </nodes>
+  <links xsi:type="gstar:Wants" id="W_OP_PUMP_TURN_ON" name="Owner PumpTurnOn" actor="AG_PUMP_CONTROLLER" element="OP_PUMP_TURN_ON"/>
+  <links xsi:type="gstar:Wants" id="W_OP_PUMP_TURN_OFF" name="Owner PumpTurnOff" actor="AG_PUMP_CONTROLLER" element="OP_PUMP_TURN_OFF"/>
+  <links xsi:type="gstar:Wants" id="W_OP_PUMP_OFF_METHANE" name="Owner PumpOffMethane" actor="AG_PUMP_CONTROLLER" element="OP_PUMP_OFF_METHANE"/>
+  <links xsi:type="gstar:Wants" id="W_OP_ALARM_ON_METHANE" name="Owner AlarmOnMethane" actor="AG_ALARM_CONTROLLER" element="OP_ALARM_ON_METHANE"/>
+  <links xsi:type="gstar:Dependency" id="DEP_NO_FLOODING_HIGH_WATER" name="NoFlooding depends on HighWaterDetected" depender="AG_PUMP_CONTROLLER" dependee="AG_HIGH_WATER_SENSOR" dependum="G_HIGH_WATER_DETECTED" dependerElmt="G_NO_FLOODING" dependeeElmt="G_HIGH_WATER_DETECTED"/>
+  <links xsi:type="gstar:Dependency" id="DEP_NO_PUMP_DAMAGED_LOW_WATER" name="NoPumpDamaged depends on LowWaterDetected" depender="AG_PUMP_CONTROLLER" dependee="AG_LOW_WATER_SENSOR" dependum="G_LOW_WATER_DETECTED" dependerElmt="G_NO_PUMP_DAMAGED" dependeeElmt="G_LOW_WATER_DETECTED"/>
+  <links xsi:type="gstar:Dependency" id="DEP_NO_EXPLOSION_METHANE" name="NoExplosion depends on MethaneDetected" depender="AG_PUMP_CONTROLLER" dependee="AG_METHANE_SENSOR" dependum="G_METHANE_DETECTED" dependerElmt="G_NO_EXPLOSION" dependeeElmt="G_METHANE_DETECTED"/>
+  <links xsi:type="gstar:Dependency" id="DEP_NO_EXPLOSION_ALARM" name="NoExplosion depends on AlarmOnMethane" depender="AG_PUMP_CONTROLLER" dependee="AG_ALARM_CONTROLLER" dependum="OP_ALARM_ON_METHANE" dependerElmt="G_NO_EXPLOSION" dependeeElmt="OP_ALARM_ON_METHANE"/>
+  <links xsi:type="gstar:ANDRefinement" id="REF_SAFE_MINE" name="Refine SafeMine" parent="G_SAFE_MINE" children="G_NO_FLOODING G_NO_PUMP_DAMAGED G_NO_EXPLOSION"/>
+  <links xsi:type="gstar:ANDRefinement" id="REF_NO_FLOODING" name="Refine NoFlooding" parent="G_NO_FLOODING" children="OP_PUMP_TURN_ON"/>
+  <links xsi:type="gstar:ANDRefinement" id="REF_NO_PUMP_DAMAGED" name="Refine NoPumpDamaged" parent="G_NO_PUMP_DAMAGED" children="OP_PUMP_TURN_OFF"/>
+  <links xsi:type="gstar:ANDRefinement" id="REF_NO_EXPLOSION" name="Refine NoExplosion" parent="G_NO_EXPLOSION" children="OP_PUMP_OFF_METHANE"/>
+</gstar:GStarModel>
