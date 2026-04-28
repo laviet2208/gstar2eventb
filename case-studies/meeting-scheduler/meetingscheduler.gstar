@@ -1,0 +1,806 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gstar:GStarModel
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:gstar="http://example.org/gstar">
+  <nodes xsi:type="gstar:Role" id="ROLE_INITIATOR" name="Meeting Initiator"/>
+  <nodes xsi:type="gstar:Role" id="ROLE_PARTICIPANT" name="Participant"/>
+  <nodes xsi:type="gstar:Agent" id="AG_SCHEDULER" name="Meeting Scheduler System" isEnv="false"/>
+  <nodes xsi:type="gstar:Role" id="ROLE_CAL_SERVICE" name="Calendar Service"/>
+  <nodes xsi:type="gstar:Role" id="ROLE_NOTIFY_SERVICE" name="Notification Service"/>
+  <nodes xsi:type="gstar:Role" id="ROLE_ROOM_SERVICE" name="Room Booking Service"/>
+  <nodes xsi:type="gstar:Agent" id="AG_ALICE" name="Alice (Initiator)"/>
+  <nodes xsi:type="gstar:Agent" id="AG_BOB" name="Bob (Participant)"/>
+  <nodes xsi:type="gstar:Agent" id="AG_CAROL" name="Carol (Participant)"/>
+  <nodes xsi:type="gstar:Agent" id="AG_DAVE" name="Dave (Participant)"/>
+  <links xsi:type="gstar:ParticipatesIn" id="L_PART_1" name="Alice plays Initiator role" inner="AG_ALICE" outer="ROLE_INITIATOR"/>
+  <links xsi:type="gstar:ParticipatesIn" id="L_PART_2" name="Bob plays Participant role" inner="AG_BOB" outer="ROLE_PARTICIPANT"/>
+  <links xsi:type="gstar:ParticipatesIn" id="L_PART_3" name="Carol plays Participant role" inner="AG_CAROL" outer="ROLE_PARTICIPANT"/>
+  <links xsi:type="gstar:ParticipatesIn" id="L_PART_4" name="Dave plays Participant role" inner="AG_DAVE" outer="ROLE_PARTICIPANT"/>
+  <nodes xsi:type="gstar:Goal" id="G_MEETING_SCHEDULED_SYS" name="Meeting Be Scheduled" mode="ACHIEVE">
+    <spec id="Q_GMS" name="Spec MeetingScheduled">
+      <snapshot id="SN_GMS" name="S_GMS">
+        <objVars id="OV_GMS_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GMS" name="scheduledEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GMS_L" name="m.scheduled" var="OV_GMS_M" attr="scheduled"/>
+        <right xsi:type="gstar:Const" id="E_GMS_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_REQUEST_REGISTERED_SYS" name="Request Registered" mode="ACHIEVE">
+    <spec id="Q_GRR" name="Spec RequestReceived">
+      <snapshot id="SN_GRR" name="S_GRR">
+        <objVars id="OV_GRR_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GRR" name="requestReceivedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GRR_L" name="m.requestReceived" var="OV_GRR_M" attr="requestReceived"/>
+        <right xsi:type="gstar:Const" id="E_GRR_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_AVAIL_COLLECTED_SYS" name="Availability Collected" mode="ACHIEVE">
+    <spec id="Q_GAC" name="Spec AvailCollected">
+      <snapshot id="SN_GAC" name="S_GAC">
+        <objVars id="OV_GAC_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GAC" name="availCollectedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GAC_L" name="m.availCollected" var="OV_GAC_M" attr="availCollected"/>
+        <right xsi:type="gstar:Const" id="E_GAC_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_SLOT_PROPOSED_SYS" name="Candidate Slot Proposed" mode="ACHIEVE">
+    <spec id="Q_GSP" name="Spec SlotProposed">
+      <snapshot id="SN_GSP" name="S_GSP">
+        <objVars id="OV_GSP_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GSP" name="slotProposedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GSP_L" name="m.slotProposed" var="OV_GSP_M" attr="slotProposed"/>
+        <right xsi:type="gstar:Const" id="E_GSP_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_ROOM_RESERVED_SYS" name="Room Reserved" mode="ACHIEVE">
+    <spec id="Q_GRM" name="Spec RoomReserved">
+      <snapshot id="SN_GRM" name="S_GRM">
+        <objVars id="OV_GRM_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GRM" name="roomReservedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GRM_L" name="m.roomReserved" var="OV_GRM_M" attr="roomReserved"/>
+        <right xsi:type="gstar:Const" id="E_GRM_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_NOTIFIED_SYS" name="All Participants Notified" mode="ACHIEVE">
+    <spec id="Q_GNT" name="Spec Notified">
+      <snapshot id="SN_GNT" name="S_GNT">
+        <objVars id="OV_GNT_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GNT" name="notifiedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GNT_L" name="m.notified" var="OV_GNT_M" attr="notified"/>
+        <right xsi:type="gstar:Const" id="E_GNT_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_RESCHEDULE_REQUESTED_SYS" name="Reschedule Requested" mode="ACHIEVE">
+    <spec id="Q_GRS" name="Spec RescheduleRequested">
+      <snapshot id="SN_GRS" name="S_GRS">
+        <objVars id="OV_GRS_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GRS" name="rescheduleRequestedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GRS_L" name="m.rescheduleRequested" var="OV_GRS_M" attr="rescheduleRequested"/>
+        <right xsi:type="gstar:Const" id="E_GRS_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_CANCELLED_SYS" name="Meeting Cancelled" mode="ACHIEVE">
+    <spec id="Q_GCN" name="Spec Cancelled">
+      <snapshot id="SN_GCN" name="S_GCN">
+        <objVars id="OV_GCN_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GCN" name="cancelledEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GCN_L" name="m.cancelled" var="OV_GCN_M" attr="cancelled"/>
+        <right xsi:type="gstar:Const" id="E_GCN_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_INIT_REQUESTED" name="Request Initiated" mode="ACHIEVE">
+    <spec id="Q_GIR" name="Spec RequestInitiated">
+      <snapshot id="SN_GIR" name="S_GIR">
+        <objVars id="OV_GIR_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GIR" name="requestInitiatedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GIR_L" name="m.requestInitiated" var="OV_GIR_M" attr="requestInitiated"/>
+        <right xsi:type="gstar:Const" id="E_GIR_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Goal" id="G_PART_CONFIRMED" name="Slot Confirmed By Participant" mode="ACHIEVE">
+    <spec id="Q_GPC" name="Spec ParticipantConfirmed">
+      <snapshot id="SN_GPC" name="S_GPC">
+        <objVars id="OV_GPC_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_GPC" name="participantConfirmedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_GPC_L" name="m.participantConfirmed" var="OV_GPC_M" attr="participantConfirmed"/>
+        <right xsi:type="gstar:Const" id="E_GPC_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Quality" id="Q_TIMELINESS_SYS" name="Timeliness">
+    <spec id="Q_QT" name="Spec Timeliness">
+      <snapshot id="SN_QT" name="S_QT">
+        <objVars id="OV_QT_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_QT" name="latencyLe60" op="LE">
+        <left xsi:type="gstar:AttrRef" id="E_QT_L" name="m.decisionLatencySeconds" var="OV_QT_M" attr="decisionLatencySeconds"/>
+        <right xsi:type="gstar:Const" id="E_QT_R" name="60" type="INT" literal="60"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Quality" id="Q_PRIVACY_SYS" name="Privacy">
+    <spec id="Q_QP" name="Spec Privacy">
+      <snapshot id="SN_QP" name="S_QP">
+        <objVars id="OV_QP_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_QP" name="consentGivenEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_QP_L" name="m.consentGiven" var="OV_QP_M" attr="consentGiven"/>
+        <right xsi:type="gstar:Const" id="E_QP_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Quality" id="Q_FAIRNESS_SYS" name="Fairness">
+    <spec id="Q_QF" name="Spec Fairness">
+      <snapshot id="SN_QF" name="S_QF">
+        <objVars id="OV_QF_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_QF" name="fairnessGe80" op="GE">
+        <left xsi:type="gstar:AttrRef" id="E_QF_L" name="m.fairnessScore" var="OV_QF_M" attr="fairnessScore"/>
+        <right xsi:type="gstar:Const" id="E_QF_R" name="80" type="INT" literal="80"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:DomainAssumption" id="DA_CAL_AVAILABLE" name="Calendar Service Available">
+    <spec id="Q_DA_CAL" name="Spec CalendarConnected">
+      <snapshot id="SN_DA_CAL" name="S_DA_CAL">
+        <objVars id="OV_DA_CAL_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_DA_CAL" name="calendarConnectedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_DA_CAL_L" name="m.calendarConnected" var="OV_DA_CAL_M" attr="calendarConnected"/>
+        <right xsi:type="gstar:Const" id="E_DA_CAL_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:DomainAssumption" id="DA_NOTIFY_AVAILABLE" name="Notification Service Available">
+    <spec id="Q_DA_NT" name="Spec NotifyConnected">
+      <snapshot id="SN_DA_NT" name="S_DA_NT">
+        <objVars id="OV_DA_NT_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_DA_NT" name="notifyConnectedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_DA_NT_L" name="m.notifyConnected" var="OV_DA_NT_M" attr="notifyConnected"/>
+        <right xsi:type="gstar:Const" id="E_DA_NT_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:DomainAssumption" id="DA_ROOM_AVAILABLE" name="Room Service Available">
+    <spec id="Q_DA_RM" name="Spec RoomServiceConnected">
+      <snapshot id="SN_DA_RM" name="S_DA_RM">
+        <objVars id="OV_DA_RM_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_DA_RM" name="roomServiceConnectedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_DA_RM_L" name="m.roomServiceConnected" var="OV_DA_RM_M" attr="roomServiceConnected"/>
+        <right xsi:type="gstar:Const" id="E_DA_RM_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Obstacle" id="OB_NO_RESPONSE" name="No Participant Response" severity="6">
+    <spec id="Q_OB_NR" name="Spec NoResponse">
+      <snapshot id="SN_OB_NR" name="S_OB_NR">
+        <objVars id="OV_OB_NR_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_OB_NR" name="responseTimeoutEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_OB_NR_L" name="m.responseTimeout" var="OV_OB_NR_M" attr="responseTimeout"/>
+        <right xsi:type="gstar:Const" id="E_OB_NR_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Obstacle" id="OB_NO_COMMON_SLOT" name="No Common Slot" severity="7">
+    <spec id="Q_OB_NS" name="Spec NoCommonSlot">
+      <snapshot id="SN_OB_NS" name="S_OB_NS">
+        <objVars id="OV_OB_NS_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_OB_NS" name="intersectionNonEmptyEqFalse" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_OB_NS_L" name="m.intersectionNonEmpty" var="OV_OB_NS_M" attr="intersectionNonEmpty"/>
+        <right xsi:type="gstar:Const" id="E_OB_NS_R" name="FALSE" type="BOOL" literal="FALSE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Obstacle" id="OB_CAL_DOWN" name="Calendar Service Down" severity="8">
+    <spec id="Q_OB_CD" name="Spec CalendarDown">
+      <snapshot id="SN_OB_CD" name="S_OB_CD">
+        <objVars id="OV_OB_CD_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_OB_CD" name="calendarConnectedEqFalse" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_OB_CD_L" name="m.calendarConnected" var="OV_OB_CD_M" attr="calendarConnected"/>
+        <right xsi:type="gstar:Const" id="E_OB_CD_R" name="FALSE" type="BOOL" literal="FALSE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Obstacle" id="OB_ROOM_UNAVAILABLE" name="Room Unavailable" severity="6">
+    <spec id="Q_OB_RU" name="Spec RoomUnavailable">
+      <snapshot id="SN_OB_RU" name="S_OB_RU">
+        <objVars id="OV_OB_RU_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_OB_RU" name="roomAvailableEqFalse" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_OB_RU_L" name="m.roomAvailable" var="OV_OB_RU_M" attr="roomAvailable"/>
+        <right xsi:type="gstar:Const" id="E_OB_RU_R" name="FALSE" type="BOOL" literal="FALSE"/>
+      </expr>
+    </spec>
+  </nodes>
+  <nodes xsi:type="gstar:Task" id="T_INIT_CREATE_REQUEST" name="Create Meeting Request"/>
+  <nodes xsi:type="gstar:Task" id="T_INIT_SELECT_RANGE" name="Select Candidate Date Range"/>
+  <nodes xsi:type="gstar:Task" id="T_INIT_SEND_INVITES" name="Send Invitations"/>
+  <!-- REMOVED: T_INIT_DECIDE_CANCEL -->
+  <nodes xsi:type="gstar:Task" id="T_PART_CHECK_CAL" name="Check Calendar"/>
+  <nodes xsi:type="gstar:Task" id="T_PART_SEND_AVAIL" name="Send Availability"/>
+  <nodes xsi:type="gstar:Task" id="T_PART_CONFIRM_SLOT" name="Confirm Proposed Slot"/>
+  <nodes xsi:type="gstar:Task" id="T_CAL_PROVIDE_STATUS" name="Provide Calendar Status"/>
+  <nodes xsi:type="gstar:Task" id="T_NOTIFY_DELIVER" name="Deliver Notifications"/>
+  <nodes xsi:type="gstar:Task" id="T_ROOM_RESERVE" name="Reserve Room"/>
+  <nodes xsi:type="gstar:Resource" id="R_ATTENDEE_LIST" name="Attendee List" resourceType="data"/>
+  <nodes xsi:type="gstar:Resource" id="R_DATE_RANGE" name="Preferred Date Range" resourceType="data"/>
+  <nodes xsi:type="gstar:Resource" id="R_PART_AVAILABILITY" name="Availability Information" resourceType="data"/>
+  <nodes xsi:type="gstar:Resource" id="R_PROPOSED_SLOT" name="Proposed Slot" resourceType="data"/>
+  <nodes xsi:type="gstar:Resource" id="R_ROOM_RESERVATION" name="Room Reservation" resourceType="record"/>
+  <nodes xsi:type="gstar:Resource" id="R_NOTIFICATION_LOG" name="Notification Log" resourceType="record"/>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_ACCEPT_REQ" name="Accept Request">
+    <preCondition id="Q_PRE_ACC" name="Pre AcceptReq">
+      <snapshot id="SN_PRE_ACC" name="S_PRE_ACC">
+        <objVars id="OV_PRE_ACC_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:Const" id="E_PRE_ACC" name="TRUE" type="BOOL" literal="TRUE"/>
+    </preCondition>
+    <postCondition id="Q_POST_ACC" name="Post AcceptReq">
+      <snapshot id="SN_POST_ACC" name="S_POST_ACC">
+        <objVars id="OV_POST_ACC_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_ACC" name="requestReceivedPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_ACC_L" name="m.requestReceivedPrime" var="OV_POST_ACC_M" attr="requestReceived" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_ACC_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_ACC_1" name="modRequestReceived" var="OV_POST_ACC_M" attr="requestReceived"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_SEND_AVAIL_REQUEST" name="Send Availability Request">
+    <preCondition id="Q_PRE_SAR" name="Pre SendAvailRequest">
+      <snapshot id="SN_PRE_SAR" name="S_PRE_SAR">
+        <objVars id="OV_PRE_SAR_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_SAR" name="requestReceivedEqTrue2" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_SAR_L" name="m.requestReceived" var="OV_PRE_SAR_M" attr="requestReceived"/>
+        <right xsi:type="gstar:Const" id="E_PRE_SAR_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_SAR" name="Post SendAvailRequest">
+      <snapshot id="SN_POST_SAR" name="S_POST_SAR">
+        <objVars id="OV_POST_SAR_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_SAR" name="availRequestSentPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_SAR_L" name="m.availRequestSentPrime" var="OV_POST_SAR_M" attr="availRequestSent" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_SAR_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_SAR_1" name="modAvailRequestSent" var="OV_POST_SAR_M" attr="availRequestSent"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_RECEIVE_AVAIL" name="Receive Availability">
+    <preCondition id="Q_PRE_RAV" name="Pre ReceiveAvail">
+      <snapshot id="SN_PRE_RAV" name="S_PRE_RAV">
+        <objVars id="OV_PRE_RAV_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_RAV" name="availRequestSentEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_RAV_L" name="m.availRequestSent" var="OV_PRE_RAV_M" attr="availRequestSent"/>
+        <right xsi:type="gstar:Const" id="E_PRE_RAV_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_RAV" name="Post ReceiveAvail">
+      <snapshot id="SN_POST_RAV" name="S_POST_RAV">
+        <objVars id="OV_POST_RAV_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_RAV" name="availReceivedPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_RAV_L" name="m.availReceivedPrime" var="OV_POST_RAV_M" attr="availReceived" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_RAV_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_RAV_1" name="modAvailReceived" var="OV_POST_RAV_M" attr="availReceived"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_MARK_AVAIL_COLLECTED" name="Mark Availability Collected">
+    <preCondition id="Q_PRE_MAC" name="Pre MarkAvailCollected">
+      <snapshot id="SN_PRE_MAC" name="S_PRE_MAC">
+        <objVars id="OV_PRE_MAC_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_MAC" name="availReceivedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_MAC_L" name="m.availReceived" var="OV_PRE_MAC_M" attr="availReceived"/>
+        <right xsi:type="gstar:Const" id="E_PRE_MAC_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_MAC" name="Post MarkAvailCollected">
+      <snapshot id="SN_POST_MAC" name="S_POST_MAC">
+        <objVars id="OV_POST_MAC_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_MAC" name="availCollectedPrimeEqTrue2" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_MAC_L" name="m.availCollectedPrime" var="OV_POST_MAC_M" attr="availCollected" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_MAC_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_MAC_1" name="modAvailCollected2" var="OV_POST_MAC_M" attr="availCollected"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_COMPUTE_INT" name="Compute Intersection">
+    <preCondition id="Q_PRE_INT" name="Pre ComputeIntersection">
+      <snapshot id="SN_PRE_INT" name="S_PRE_INT">
+        <objVars id="OV_PRE_INT_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_INT" name="availCollectedEqTrue2" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_INT_L" name="m.availCollected" var="OV_PRE_INT_M" attr="availCollected"/>
+        <right xsi:type="gstar:Const" id="E_PRE_INT_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_INT" name="Post ComputeIntersection">
+      <snapshot id="SN_POST_INT" name="S_POST_INT">
+        <objVars id="OV_POST_INT_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_INT" name="intersectionNonEmptyPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_INT_L" name="m.intersectionNonEmptyPrime" var="OV_POST_INT_M" attr="intersectionNonEmpty" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_INT_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_INT_1" name="modIntersectionNonEmpty" var="OV_POST_INT_M" attr="intersectionNonEmpty"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_PROPOSE_SLOT" name="Propose Candidate Slot">
+    <preCondition id="Q_PRE_PROP" name="Pre ProposeSlot">
+      <snapshot id="SN_PRE_PROP" name="S_PRE_PROP">
+        <objVars id="OV_PRE_PROP_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_PROP" name="intersectionNonEmptyEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_PROP_L" name="m.intersectionNonEmpty" var="OV_PRE_PROP_M" attr="intersectionNonEmpty"/>
+        <right xsi:type="gstar:Const" id="E_PRE_PROP_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_PROP" name="Post ProposeSlot">
+      <snapshot id="SN_POST_PROP" name="S_POST_PROP">
+        <objVars id="OV_POST_PROP_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_PROP" name="slotProposedPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_PROP_L" name="m.slotProposedPrime" var="OV_POST_PROP_M" attr="slotProposed" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_PROP_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_PROP_1" name="modSlotProposed" var="OV_POST_PROP_M" attr="slotProposed"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_RESERVE_ROOM" name="Reserve Room">
+    <preCondition id="Q_PRE_RRM" name="Pre ReserveRoom">
+      <snapshot id="SN_PRE_RRM" name="S_PRE_RRM">
+        <objVars id="OV_PRE_RRM_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_RRM" name="slotProposedEqTrue2" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_RRM_L" name="m.slotProposed" var="OV_PRE_RRM_M" attr="slotProposed"/>
+        <right xsi:type="gstar:Const" id="E_PRE_RRM_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_RRM" name="Post ReserveRoom">
+      <snapshot id="SN_POST_RRM" name="S_POST_RRM">
+        <objVars id="OV_POST_RRM_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_RRM" name="roomReservedPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_RRM_L" name="m.roomReservedPrime" var="OV_POST_RRM_M" attr="roomReserved" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_RRM_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_RRM_1" name="modRoomReserved" var="OV_POST_RRM_M" attr="roomReserved"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_NOTIFY" name="Notify Participants">
+    <preCondition id="Q_PRE_NFY" name="Pre Notify">
+      <snapshot id="SN_PRE_NFY" name="S_PRE_NFY">
+        <objVars id="OV_PRE_NFY_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_NFY" name="roomReservedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_NFY_L" name="m.roomReserved" var="OV_PRE_NFY_M" attr="roomReserved"/>
+        <right xsi:type="gstar:Const" id="E_PRE_NFY_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_NFY" name="Post Notify">
+      <snapshot id="SN_POST_NFY" name="S_POST_NFY">
+        <objVars id="OV_POST_NFY_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_NFY" name="notifiedPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_NFY_L" name="m.notifiedPrime" var="OV_POST_NFY_M" attr="notified" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_NFY_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_NFY_1" name="modNotified" var="OV_POST_NFY_M" attr="notified"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_CONFIRM_SLOT" name="Confirm Slot">
+    <preCondition id="Q_PRE_CONF" name="Pre ConfirmSlot">
+      <snapshot id="SN_PRE_CONF" name="S_PRE_CONF">
+        <objVars id="OV_PRE_CONF_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:And" id="E_PRE_CONF_AND" name="roomAndNotified">
+        <left xsi:type="gstar:RelOp" id="E_PRE_CONF_1" name="notifiedEqTrue" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="E_PRE_CONF_1_L" name="m.notified" var="OV_PRE_CONF_M" attr="notified"/>
+          <right xsi:type="gstar:Const" id="E_PRE_CONF_1_R" name="TRUE" type="BOOL" literal="TRUE"/>
+        </left>
+        <right xsi:type="gstar:RelOp" id="E_PRE_CONF_2" name="participantConfirmedEqTrue2" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="E_PRE_CONF_2_L" name="m.participantConfirmed" var="OV_PRE_CONF_M" attr="participantConfirmed"/>
+          <right xsi:type="gstar:Const" id="E_PRE_CONF_2_R" name="TRUE" type="BOOL" literal="TRUE"/>
+        </right>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_CONF" name="Post ConfirmSlot">
+      <snapshot id="SN_POST_CONF" name="S_POST_CONF">
+        <objVars id="OV_POST_CONF_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_CONF" name="scheduledPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_CONF_L" name="m.scheduledPrime" var="OV_POST_CONF_M" attr="scheduled" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_CONF_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_CONF_1" name="modScheduled" var="OV_POST_CONF_M" attr="scheduled"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_TIMEOUT" name="Timeout Waiting Responses">
+    <preCondition id="Q_PRE_TO" name="Pre Timeout">
+      <snapshot id="SN_PRE_TO" name="S_PRE_TO">
+        <objVars id="OV_PRE_TO_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_TO" name="availRequestSentEqTrue2" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_TO_L" name="m.availRequestSent" var="OV_PRE_TO_M" attr="availRequestSent"/>
+        <right xsi:type="gstar:Const" id="E_PRE_TO_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_TO" name="Post Timeout">
+      <snapshot id="SN_POST_TO" name="S_POST_TO">
+        <objVars id="OV_POST_TO_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_TO" name="responseTimeoutPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_TO_L" name="m.responseTimeoutPrime" var="OV_POST_TO_M" attr="responseTimeout" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_TO_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_TO_1" name="modResponseTimeout" var="OV_POST_TO_M" attr="responseTimeout"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_REQUEST_RESCHEDULE" name="Request Reschedule">
+    <preCondition id="Q_PRE_RS" name="Pre RequestReschedule">
+      <snapshot id="SN_PRE_RS" name="S_PRE_RS">
+        <objVars id="OV_PRE_RS_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:Or" id="E_PRE_RS_OR" name="timeoutOrNoCommon">
+        <left xsi:type="gstar:RelOp" id="E_PRE_RS_1" name="timeoutEqTrue" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="E_PRE_RS_1_L" name="m.responseTimeout" var="OV_PRE_RS_M" attr="responseTimeout"/>
+          <right xsi:type="gstar:Const" id="E_PRE_RS_1_R" name="TRUE" type="BOOL" literal="TRUE"/>
+        </left>
+        <right xsi:type="gstar:RelOp" id="E_PRE_RS_2" name="intersectionNonEmptyEqFalse2" op="EQ">
+          <left xsi:type="gstar:AttrRef" id="E_PRE_RS_2_L" name="m.intersectionNonEmpty" var="OV_PRE_RS_M" attr="intersectionNonEmpty"/>
+          <right xsi:type="gstar:Const" id="E_PRE_RS_2_R" name="FALSE" type="BOOL" literal="FALSE"/>
+        </right>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_RS" name="Post RequestReschedule">
+      <snapshot id="SN_POST_RS" name="S_POST_RS">
+        <objVars id="OV_POST_RS_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_RS" name="rescheduleRequestedPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_RS_L" name="m.rescheduleRequestedPrime" var="OV_POST_RS_M" attr="rescheduleRequested" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_RS_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_RS_1" name="modRescheduleRequested" var="OV_POST_RS_M" attr="rescheduleRequested"/>
+  </nodes>
+  <nodes xsi:type="gstar:Operation" id="OP_SYS_CANCEL" name="Cancel Meeting">
+    <preCondition id="Q_PRE_CN" name="Pre Cancel">
+      <snapshot id="SN_PRE_CN" name="S_PRE_CN">
+        <objVars id="OV_PRE_CN_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_PRE_CN" name="rescheduleRequestedEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_PRE_CN_L" name="m.rescheduleRequested" var="OV_PRE_CN_M" attr="rescheduleRequested"/>
+        <right xsi:type="gstar:Const" id="E_PRE_CN_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </preCondition>
+    <postCondition id="Q_POST_CN" name="Post Cancel">
+      <snapshot id="SN_POST_CN" name="S_POST_CN">
+        <objVars id="OV_POST_CN_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_POST_CN" name="cancelledPrimeEqTrue" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_POST_CN_L" name="m.cancelledPrime" var="OV_POST_CN_M" attr="cancelled" isPrime="true"/>
+        <right xsi:type="gstar:Const" id="E_POST_CN_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </postCondition>
+    <modifies id="MOD_CN_1" name="modCancelled" var="OV_POST_CN_M" attr="cancelled"/>
+  </nodes>
+
+  <links xsi:type="gstar:Wants" id="W_SYS_G1" actor="AG_SCHEDULER" element="G_MEETING_SCHEDULED_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_G2" actor="AG_SCHEDULER" element="G_REQUEST_REGISTERED_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_G3" actor="AG_SCHEDULER" element="G_AVAIL_COLLECTED_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_G4" actor="AG_SCHEDULER" element="G_SLOT_PROPOSED_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_G5" actor="AG_SCHEDULER" element="G_ROOM_RESERVED_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_G6" actor="AG_SCHEDULER" element="G_NOTIFIED_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_G7" actor="AG_SCHEDULER" element="G_RESCHEDULE_REQUESTED_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_G8" actor="AG_SCHEDULER" element="G_CANCELLED_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_Q1" actor="AG_SCHEDULER" element="Q_TIMELINESS_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_Q2" actor="AG_SCHEDULER" element="Q_PRIVACY_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_Q3" actor="AG_SCHEDULER" element="Q_FAIRNESS_SYS"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OB1" actor="AG_SCHEDULER" element="OB_NO_RESPONSE"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OB2" actor="AG_SCHEDULER" element="OB_NO_COMMON_SLOT"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OB3" actor="AG_SCHEDULER" element="OB_CAL_DOWN"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OB4" actor="AG_SCHEDULER" element="OB_ROOM_UNAVAILABLE"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP1" actor="AG_SCHEDULER" element="OP_SYS_ACCEPT_REQ"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP2" actor="AG_SCHEDULER" element="OP_SYS_SEND_AVAIL_REQUEST"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP3" actor="AG_SCHEDULER" element="OP_SYS_RECEIVE_AVAIL"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP4" actor="AG_SCHEDULER" element="OP_SYS_MARK_AVAIL_COLLECTED"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP5" actor="AG_SCHEDULER" element="OP_SYS_COMPUTE_INT"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP6" actor="AG_SCHEDULER" element="OP_SYS_PROPOSE_SLOT"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP7" actor="AG_SCHEDULER" element="OP_SYS_RESERVE_ROOM"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP8" actor="AG_SCHEDULER" element="OP_SYS_NOTIFY"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP9" actor="AG_SCHEDULER" element="OP_SYS_CONFIRM_SLOT"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP10" actor="AG_SCHEDULER" element="OP_SYS_TIMEOUT"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP11" actor="AG_SCHEDULER" element="OP_SYS_REQUEST_RESCHEDULE"/>
+  <links xsi:type="gstar:Wants" id="W_SYS_OP12" actor="AG_SCHEDULER" element="OP_SYS_CANCEL"/>
+  <links xsi:type="gstar:Wants" id="W_INIT_G1" actor="ROLE_INITIATOR" element="G_INIT_REQUESTED"/>
+  <links xsi:type="gstar:Wants" id="W_INIT_T1" actor="ROLE_INITIATOR" element="T_INIT_CREATE_REQUEST"/>
+  <links xsi:type="gstar:Wants" id="W_INIT_T2" actor="ROLE_INITIATOR" element="T_INIT_SELECT_RANGE"/>
+  <links xsi:type="gstar:Wants" id="W_INIT_T3" actor="ROLE_INITIATOR" element="T_INIT_SEND_INVITES"/>
+  <!-- REMOVED: W_INIT_T4 (Decide Cancel) -->
+  <links xsi:type="gstar:Wants" id="W_INIT_R1" actor="ROLE_INITIATOR" element="R_ATTENDEE_LIST"/>
+  <links xsi:type="gstar:Wants" id="W_INIT_R2" actor="ROLE_INITIATOR" element="R_DATE_RANGE"/>
+  <links xsi:type="gstar:Wants" id="W_PART_G1" actor="ROLE_PARTICIPANT" element="G_PART_CONFIRMED"/>
+  <links xsi:type="gstar:Wants" id="W_PART_T1" actor="ROLE_PARTICIPANT" element="T_PART_CHECK_CAL"/>
+  <links xsi:type="gstar:Wants" id="W_PART_T2" actor="ROLE_PARTICIPANT" element="T_PART_SEND_AVAIL"/>
+  <links xsi:type="gstar:Wants" id="W_PART_T3" actor="ROLE_PARTICIPANT" element="T_PART_CONFIRM_SLOT"/>
+  <links xsi:type="gstar:Wants" id="W_PART_R1" actor="ROLE_PARTICIPANT" element="R_PART_AVAILABILITY"/>
+  <links xsi:type="gstar:Wants" id="W_CAL_DA1" actor="ROLE_CAL_SERVICE" element="DA_CAL_AVAILABLE"/>
+  <links xsi:type="gstar:Wants" id="W_CAL_T1" actor="ROLE_CAL_SERVICE" element="T_CAL_PROVIDE_STATUS"/>
+  <links xsi:type="gstar:Wants" id="W_NTF_DA1" actor="ROLE_NOTIFY_SERVICE" element="DA_NOTIFY_AVAILABLE"/>
+  <links xsi:type="gstar:Wants" id="W_NTF_T1" actor="ROLE_NOTIFY_SERVICE" element="T_NOTIFY_DELIVER"/>
+  <links xsi:type="gstar:Wants" id="W_NTF_R1" actor="ROLE_NOTIFY_SERVICE" element="R_NOTIFICATION_LOG"/>
+  <links xsi:type="gstar:Wants" id="W_ROOM_DA1" actor="ROLE_ROOM_SERVICE" element="DA_ROOM_AVAILABLE"/>
+  <links xsi:type="gstar:Wants" id="W_ROOM_T1" actor="ROLE_ROOM_SERVICE" element="T_ROOM_RESERVE"/>
+  <links xsi:type="gstar:Wants" id="W_ROOM_R1" actor="ROLE_ROOM_SERVICE" element="R_ROOM_RESERVATION"/>
+
+  <links xsi:type="gstar:ANDRefinement" id="RF_SYS_AND_1" name="SystemScheduleMainFlow" parent="G_MEETING_SCHEDULED_SYS" children="G_REQUEST_REGISTERED_SYS G_AVAIL_COLLECTED_SYS G_SLOT_PROPOSED_SYS G_ROOM_RESERVED_SYS G_NOTIFIED_SYS OP_SYS_CONFIRM_SLOT"/>
+  <links xsi:type="gstar:ANDRefinement" id="RF_SYS_AND_2" name="RegisterRequestFlow" parent="G_REQUEST_REGISTERED_SYS" children="OP_SYS_ACCEPT_REQ"/>
+  <links xsi:type="gstar:ANDRefinement" id="RF_SYS_AND_3" name="AvailabilityFlow" parent="G_AVAIL_COLLECTED_SYS" children="OP_SYS_SEND_AVAIL_REQUEST OP_SYS_RECEIVE_AVAIL OP_SYS_MARK_AVAIL_COLLECTED"/>
+  <links xsi:type="gstar:ANDRefinement" id="RF_SYS_AND_4" name="ProposalFlow" parent="G_SLOT_PROPOSED_SYS" children="OP_SYS_COMPUTE_INT OP_SYS_PROPOSE_SLOT"/>
+  <links xsi:type="gstar:ANDRefinement" id="RF_SYS_AND_5" name="RoomAndNotifyFlow" parent="G_NOTIFIED_SYS" children="OP_SYS_NOTIFY"/>
+  <links xsi:type="gstar:ANDRefinement" id="RF_SYS_AND_6" name="RescheduleFlow" parent="G_RESCHEDULE_REQUESTED_SYS" children="OP_SYS_TIMEOUT OP_SYS_REQUEST_RESCHEDULE"/>
+  <links xsi:type="gstar:ANDRefinement" id="RF_INIT_AND_1" name="InitiatorRequestSteps" parent="G_INIT_REQUESTED" children="T_INIT_CREATE_REQUEST T_INIT_SELECT_RANGE T_INIT_SEND_INVITES"/>
+
+  <links xsi:type="gstar:NeededBy" id="NB_INIT_1" resource="R_ATTENDEE_LIST" user="T_INIT_SEND_INVITES"/>
+  <links xsi:type="gstar:NeededBy" id="NB_INIT_2" resource="R_DATE_RANGE" user="T_INIT_SELECT_RANGE"/>
+  <links xsi:type="gstar:NeededBy" id="NB_PART_1" resource="R_PART_AVAILABILITY" user="T_PART_SEND_AVAIL"/>
+  <links xsi:type="gstar:NeededBy" id="NB_SYS_1" resource="R_PROPOSED_SLOT" user="OP_SYS_PROPOSE_SLOT"/>
+  <links xsi:type="gstar:NeededBy" id="NB_ROOM_1" resource="R_ROOM_RESERVATION" user="T_ROOM_RESERVE"/>
+  <links xsi:type="gstar:NeededBy" id="NB_NTF_1" resource="R_NOTIFICATION_LOG" user="T_NOTIFY_DELIVER"/>
+
+  <links xsi:type="gstar:Obstructs" id="OBS_1" obstacle="OB_NO_RESPONSE" obstructed="G_AVAIL_COLLECTED_SYS"/>
+  <links xsi:type="gstar:Obstructs" id="OBS_2" obstacle="OB_NO_COMMON_SLOT" obstructed="G_SLOT_PROPOSED_SYS"/>
+  <links xsi:type="gstar:Obstructs" id="OBS_3" obstacle="OB_CAL_DOWN" obstructed="G_AVAIL_COLLECTED_SYS"/>
+  <links xsi:type="gstar:Obstructs" id="OBS_4" obstacle="OB_ROOM_UNAVAILABLE" obstructed="G_ROOM_RESERVED_SYS"/>
+
+  <links xsi:type="gstar:Dependency" id="DP_1" name="InitiatorDependsOnScheduler" depender="ROLE_INITIATOR" dependee="AG_SCHEDULER" dependum="G_MEETING_SCHEDULED_SYS" dependerElmt="T_INIT_SEND_INVITES" dependeeElmt="OP_SYS_CONFIRM_SLOT"/>
+  <links xsi:type="gstar:Dependency" id="DP_2" name="SchedulerDependsOnParticipantsAvailability" depender="AG_SCHEDULER" dependee="ROLE_PARTICIPANT" dependum="R_PART_AVAILABILITY" dependerElmt="OP_SYS_RECEIVE_AVAIL" dependeeElmt="T_PART_SEND_AVAIL"/>
+  <links xsi:type="gstar:Dependency" id="DP_3" name="SchedulerDependsOnCalendarService" depender="AG_SCHEDULER" dependee="ROLE_CAL_SERVICE" dependum="DA_CAL_AVAILABLE" dependerElmt="OP_SYS_RECEIVE_AVAIL" dependeeElmt="T_CAL_PROVIDE_STATUS"/>
+  <links xsi:type="gstar:Dependency" id="DP_4" name="SchedulerDependsOnNotificationService" depender="AG_SCHEDULER" dependee="ROLE_NOTIFY_SERVICE" dependum="DA_NOTIFY_AVAILABLE" dependerElmt="OP_SYS_NOTIFY" dependeeElmt="T_NOTIFY_DELIVER"/>
+  <links xsi:type="gstar:Dependency" id="DP_5" name="SchedulerDependsOnRoomService" depender="AG_SCHEDULER" dependee="ROLE_ROOM_SERVICE" dependum="DA_ROOM_AVAILABLE" dependerElmt="OP_SYS_RESERVE_ROOM" dependeeElmt="T_ROOM_RESERVE"/>
+  <links xsi:type="gstar:Dependency" id="DP_6" name="SchedulerDependsOnParticipantConfirmation" depender="AG_SCHEDULER" dependee="ROLE_PARTICIPANT" dependum="G_PART_CONFIRMED" dependerElmt="OP_SYS_CONFIRM_SLOT" dependeeElmt="T_PART_CONFIRM_SLOT"/>
+
+  <links xsi:type="gstar:ANDRefinement" id="RF_SYS_AND_5A" parent="G_ROOM_RESERVED_SYS" children="OP_SYS_RESERVE_ROOM"/>
+
+  <!-- FIXED: removed T_INIT_DECIDE_CANCEL from cancellation refinement -->
+  <links xsi:type="gstar:ANDRefinement" id="RF_SYS_AND_7" parent="G_CANCELLED_SYS" children="OP_SYS_CANCEL"/>
+
+  <links xsi:type="gstar:ANDRefinement" id="RF_PART_AND_1" parent="G_PART_CONFIRMED" children="T_PART_CONFIRM_SLOT OP_SYS_CONFIRM_SLOT"/>
+
+  <links xsi:type="gstar:Qualifies" id="QLF_SYS_1" quality="Q_TIMELINESS_SYS" qualified="G_MEETING_SCHEDULED_SYS"/>
+  <links xsi:type="gstar:Qualifies" id="QLF_SYS_2" quality="Q_PRIVACY_SYS" qualified="G_AVAIL_COLLECTED_SYS"/>
+  <links xsi:type="gstar:Qualifies" id="QLF_SYS_3" quality="Q_FAIRNESS_SYS" qualified="G_SLOT_PROPOSED_SYS"/>
+
+  <links xsi:type="gstar:Contribution" id="CTR_SYS_1" source="G_MEETING_SCHEDULED_SYS" target="Q_TIMELINESS_SYS" polarity="MAKE"/>
+  <links xsi:type="gstar:Contribution" id="CTR_SYS_2" source="OP_SYS_TIMEOUT" target="Q_TIMELINESS_SYS" polarity="HURT"/>
+  <links xsi:type="gstar:Contribution" id="CTR_SYS_3" source="OP_SYS_RECEIVE_AVAIL" target="Q_PRIVACY_SYS" polarity="HURT"/>
+  <links xsi:type="gstar:Contribution" id="CTR_SYS_4" source="OP_SYS_PROPOSE_SLOT" target="Q_FAIRNESS_SYS" polarity="HELP"/>
+  <links xsi:type="gstar:Contribution" id="CTR_SYS_5" source="G_SLOT_PROPOSED_SYS" target="Q_FAIRNESS_SYS" polarity="MAKE"/>
+
+
+  <!-- ===================== SpecPro / Temporal Layer ===================== -->
+  <temporalVariables id="TV_REQ_RECEIVED" name="requestReceivedVar" kind="INPUT" dataType="BOOL">
+    <binding id="Q_TV_REQ" name="BindRequestReceived">
+      <snapshot id="SN_TV_REQ" name="S_TV_REQ">
+        <objVars id="OV_TV_REQ_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TV_REQ" name="requestReceivedEqTrueBind" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TV_REQ_L" name="m.requestReceived" var="OV_TV_REQ_M" attr="requestReceived"/>
+        <right xsi:type="gstar:Const" id="E_TV_REQ_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </binding>
+  </temporalVariables>
+  <temporalVariables id="TV_AVAIL_COLLECTED" name="availCollectedVar" kind="INTERNAL" dataType="BOOL">
+    <binding id="Q_TV_AC" name="BindAvailCollected">
+      <snapshot id="SN_TV_AC" name="S_TV_AC">
+        <objVars id="OV_TV_AC_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TV_AC" name="availCollectedEqTrueBind" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TV_AC_L" name="m.availCollected" var="OV_TV_AC_M" attr="availCollected"/>
+        <right xsi:type="gstar:Const" id="E_TV_AC_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </binding>
+  </temporalVariables>
+  <temporalVariables id="TV_SLOT_PROPOSED" name="slotProposedVar" kind="OUTPUT" dataType="BOOL">
+    <binding id="Q_TV_SP" name="BindSlotProposed">
+      <snapshot id="SN_TV_SP" name="S_TV_SP">
+        <objVars id="OV_TV_SP_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TV_SP" name="slotProposedEqTrueBind" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TV_SP_L" name="m.slotProposed" var="OV_TV_SP_M" attr="slotProposed"/>
+        <right xsi:type="gstar:Const" id="E_TV_SP_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </binding>
+  </temporalVariables>
+  <temporalVariables id="TV_NOTIFIED" name="notifiedVar" kind="OUTPUT" dataType="BOOL">
+    <binding id="Q_TV_NT" name="BindNotified">
+      <snapshot id="SN_TV_NT" name="S_TV_NT">
+        <objVars id="OV_TV_NT_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TV_NT" name="notifiedEqTrueBind" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TV_NT_L" name="m.notified" var="OV_TV_NT_M" attr="notified"/>
+        <right xsi:type="gstar:Const" id="E_TV_NT_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </binding>
+  </temporalVariables>
+  <temporalVariables id="TV_SCHEDULED" name="scheduledVar" kind="OUTPUT" dataType="BOOL">
+    <binding id="Q_TV_SC" name="BindScheduled">
+      <snapshot id="SN_TV_SC" name="S_TV_SC">
+        <objVars id="OV_TV_SC_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TV_SC" name="scheduledEqTrueBind" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TV_SC_L" name="m.scheduled" var="OV_TV_SC_M" attr="scheduled"/>
+        <right xsi:type="gstar:Const" id="E_TV_SC_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </binding>
+  </temporalVariables>
+  <temporalVariables id="TV_CANCELLED" name="cancelledVar" kind="OUTPUT" dataType="BOOL">
+    <binding id="Q_TV_CN" name="BindCancelled">
+      <snapshot id="SN_TV_CN" name="S_TV_CN">
+        <objVars id="OV_TV_CN_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TV_CN" name="cancelledEqTrueBind" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TV_CN_L" name="m.cancelled" var="OV_TV_CN_M" attr="cancelled"/>
+        <right xsi:type="gstar:Const" id="E_TV_CN_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </binding>
+  </temporalVariables>
+
+  <temporalRequirements id="TR_MEETING_EVENTUALLY_SCHEDULED" name="EventuallyScheduleMeeting" kind="EVENTUALITY" scope="GLOBAL" pattern="Existence" component="MeetingScheduler" formalism="SpecPro+LTL" fretishText="Globally, once a request is received, the meeting shall eventually be scheduled." ltlText="G(requestReceived -> F scheduled)">
+    <trigger id="Q_TR_1" name="TriggerRequestReceived">
+      <snapshot id="SN_TR_1" name="S_TR_1">
+        <objVars id="OV_TR_1_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TR_1" name="requestReceivedEqTrueTR" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TR_1_L" name="m.requestReceived" var="OV_TR_1_M" attr="requestReceived"/>
+        <right xsi:type="gstar:Const" id="E_TR_1_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </trigger>
+    <response id="Q_RP_1" name="ResponseScheduled">
+      <snapshot id="SN_RP_1" name="S_RP_1">
+        <objVars id="OV_RP_1_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_RP_1" name="scheduledEqTrueTR" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_RP_1_L" name="m.scheduled" var="OV_RP_1_M" attr="scheduled"/>
+        <right xsi:type="gstar:Const" id="E_RP_1_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </response>
+  </temporalRequirements>
+
+  <temporalRequirements id="TR_REQUEST_TO_AVAIL_REQUEST" name="RequestLeadsToAvailabilityRequest" kind="RESPONSE" scope="GLOBAL" pattern="Response" component="MeetingScheduler" formalism="SpecPro+LTL" fretishText="Globally, if a request is received, the system shall eventually send an availability request." ltlText="G(requestReceived -> F availRequestSent)">
+    <trigger id="Q_TR_2" name="TriggerRequestReceived2">
+      <snapshot id="SN_TR_2" name="S_TR_2">
+        <objVars id="OV_TR_2_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TR_2" name="requestReceivedEqTrueTR2" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TR_2_L" name="m.requestReceived" var="OV_TR_2_M" attr="requestReceived"/>
+        <right xsi:type="gstar:Const" id="E_TR_2_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </trigger>
+    <response id="Q_RP_2" name="ResponseAvailRequestSent">
+      <snapshot id="SN_RP_2" name="S_RP_2">
+        <objVars id="OV_RP_2_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_RP_2" name="availRequestSentEqTrueTR" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_RP_2_L" name="m.availRequestSent" var="OV_RP_2_M" attr="availRequestSent"/>
+        <right xsi:type="gstar:Const" id="E_RP_2_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </response>
+  </temporalRequirements>
+
+  <temporalRequirements id="TR_AVAIL_TO_PROPOSAL" name="AvailabilityCollectedLeadsToProposal" kind="RESPONSE" scope="GLOBAL" pattern="Response" component="MeetingScheduler" formalism="SpecPro+LTL" fretishText="Globally, if availability is collected, the system shall eventually propose a candidate slot." ltlText="G(availCollected -> F slotProposed)">
+    <trigger id="Q_TR_3" name="TriggerAvailCollected">
+      <snapshot id="SN_TR_3" name="S_TR_3">
+        <objVars id="OV_TR_3_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TR_3" name="availCollectedEqTrueTR" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TR_3_L" name="m.availCollected" var="OV_TR_3_M" attr="availCollected"/>
+        <right xsi:type="gstar:Const" id="E_TR_3_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </trigger>
+    <response id="Q_RP_3" name="ResponseSlotProposed">
+      <snapshot id="SN_RP_3" name="S_RP_3">
+        <objVars id="OV_RP_3_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_RP_3" name="slotProposedEqTrueTR" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_RP_3_L" name="m.slotProposed" var="OV_RP_3_M" attr="slotProposed"/>
+        <right xsi:type="gstar:Const" id="E_RP_3_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </response>
+  </temporalRequirements>
+
+  <temporalRequirements id="TR_PROPOSAL_TO_NOTIFICATION" name="ProposalLeadsToNotification" kind="RESPONSE" scope="GLOBAL" pattern="Response" component="MeetingScheduler" formalism="SpecPro+LTL" fretishText="Globally, if a candidate slot is proposed, the system shall eventually notify all participants." ltlText="G(slotProposed -> F notified)">
+    <trigger id="Q_TR_4" name="TriggerSlotProposed">
+      <snapshot id="SN_TR_4" name="S_TR_4">
+        <objVars id="OV_TR_4_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_TR_4" name="slotProposedEqTrueTR2" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_TR_4_L" name="m.slotProposed" var="OV_TR_4_M" attr="slotProposed"/>
+        <right xsi:type="gstar:Const" id="E_TR_4_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </trigger>
+    <response id="Q_RP_4" name="ResponseNotified">
+      <snapshot id="SN_RP_4" name="S_RP_4">
+        <objVars id="OV_RP_4_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_RP_4" name="notifiedEqTrueTR" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_RP_4_L" name="m.notified" var="OV_RP_4_M" attr="notified"/>
+        <right xsi:type="gstar:Const" id="E_RP_4_R" name="TRUE" type="BOOL" literal="TRUE"/>
+      </expr>
+    </response>
+  </temporalRequirements>
+
+  <temporalRequirements id="TR_NEVER_SCHEDULED_AND_CANCELLED" name="NeverScheduledAndCancelledTogether" kind="INVARIANCE" scope="GLOBAL" pattern="Universality" component="MeetingScheduler" formalism="SpecPro+LTL" fretishText="Globally, it shall never be the case that a meeting is both scheduled and cancelled." ltlText="G(!(scheduled &amp;&amp; cancelled))">
+    <statePredicate id="Q_ST_1" name="StateNotScheduledAndCancelled">
+      <snapshot id="SN_ST_1" name="S_ST_1">
+        <objVars id="OV_ST_1_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:Not" id="E_ST_1" name="notBothScheduledCancelled">
+        <operand xsi:type="gstar:And" id="E_ST_1_IN" name="scheduledAndCancelled">
+          <left xsi:type="gstar:RelOp" id="E_ST_1_L" name="scheduledEqTrueState" op="EQ">
+            <left xsi:type="gstar:AttrRef" id="E_ST_1_LL" name="m.scheduled" var="OV_ST_1_M" attr="scheduled"/>
+            <right xsi:type="gstar:Const" id="E_ST_1_LR" name="TRUE" type="BOOL" literal="TRUE"/>
+          </left>
+          <right xsi:type="gstar:RelOp" id="E_ST_1_R" name="cancelledEqTrueState" op="EQ">
+            <left xsi:type="gstar:AttrRef" id="E_ST_1_RL" name="m.cancelled" var="OV_ST_1_M" attr="cancelled"/>
+            <right xsi:type="gstar:Const" id="E_ST_1_RR" name="TRUE" type="BOOL" literal="TRUE"/>
+          </right>
+        </operand>
+      </expr>
+    </statePredicate>
+  </temporalRequirements>
+
+  <temporalRequirements id="TR_PARTICIPANT_RESPONSE_ASSUMPTION" name="ParticipantsEventuallyRespondAssumption" kind="ASSUMPTION" scope="GLOBAL" pattern="Assumption" component="Environment" formalism="SpecPro+LTL" fretishText="Assume globally that participant responses do not time out indefinitely." ltlText="G(!responseTimeout)">
+    <statePredicate id="Q_ST_2" name="StateNoResponseTimeout">
+      <snapshot id="SN_ST_2" name="S_ST_2">
+        <objVars id="OV_ST_2_M" name="m" varName="m" type="Meeting"/>
+      </snapshot>
+      <expr xsi:type="gstar:RelOp" id="E_ST_2" name="responseTimeoutEqFalseState" op="EQ">
+        <left xsi:type="gstar:AttrRef" id="E_ST_2_L" name="m.responseTimeout" var="OV_ST_2_M" attr="responseTimeout"/>
+        <right xsi:type="gstar:Const" id="E_ST_2_R" name="FALSE" type="BOOL" literal="FALSE"/>
+      </expr>
+    </statePredicate>
+  </temporalRequirements>
+
+  <temporalLinks id="TL_1" role="DEFINES" source="G_MEETING_SCHEDULED_SYS" requirement="TR_MEETING_EVENTUALLY_SCHEDULED"/>
+  <temporalLinks id="TL_2" role="OPERATIONALIZES" source="OP_SYS_SEND_AVAIL_REQUEST" requirement="TR_REQUEST_TO_AVAIL_REQUEST"/>
+  <temporalLinks id="TL_3" role="DEFINES" source="G_AVAIL_COLLECTED_SYS" requirement="TR_AVAIL_TO_PROPOSAL"/>
+  <temporalLinks id="TL_4" role="OPERATIONALIZES" source="OP_SYS_PROPOSE_SLOT" requirement="TR_AVAIL_TO_PROPOSAL"/>
+  <temporalLinks id="TL_5" role="DEFINES" source="G_NOTIFIED_SYS" requirement="TR_PROPOSAL_TO_NOTIFICATION"/>
+  <temporalLinks id="TL_6" role="OPERATIONALIZES" source="OP_SYS_NOTIFY" requirement="TR_PROPOSAL_TO_NOTIFICATION"/>
+  <temporalLinks id="TL_7" role="CONSTRAINS" source="G_MEETING_SCHEDULED_SYS" requirement="TR_NEVER_SCHEDULED_AND_CANCELLED"/>
+  <temporalLinks id="TL_8" role="CONSTRAINS" source="G_CANCELLED_SYS" requirement="TR_NEVER_SCHEDULED_AND_CANCELLED"/>
+  <temporalLinks id="TL_9" role="ASSUMES" source="DA_CAL_AVAILABLE" requirement="TR_PARTICIPANT_RESPONSE_ASSUMPTION"/>
+
+</gstar:GStarModel>
