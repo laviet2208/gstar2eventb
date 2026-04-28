@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="gstar" nsURI="http://example.org/gstar" nsPrefix="gstar">
+  <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+    <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL"/>
+    <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL"/>
+    <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL"/>
+  </eAnnotations>
+  <eClassifiers xsi:type="ecore:EEnum" name="GoalMode">
+    <eLiterals name="ACHIEVE"/>
+    <eLiterals name="MAINTAIN" value="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ContributionPolarity">
+    <eLiterals name="MAKE"/>
+    <eLiterals name="HELP" value="1"/>
+    <eLiterals name="HURT" value="2"/>
+    <eLiterals name="BREAK" value="3"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="GStarModel">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="uniqueTemporalVariableNames"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="uniqueTemporalVariableNames" value="self.temporalVariables->isUnique(v | v.name)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="nodes" upperBound="-1"
+        eType="#//GStarNode" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="links" upperBound="-1"
+        eType="#//GStarLink" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="temporalRequirements" upperBound="-1"
+        eType="#//TemporalRequirement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="temporalLinks" upperBound="-1"
+        eType="#//TemporalLink" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="temporalVariables" upperBound="-1"
+        eType="#//TemporalVariable" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="GStarElement" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        iD="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="GStarNode" abstract="true" eSuperTypes="#//GStarElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="GStarLink" abstract="true" eSuperTypes="#//GStarElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Actor" abstract="true" eSuperTypes="#//GStarNode">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isEnv" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Agent" eSuperTypes="#//Actor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Role" eSuperTypes="#//Actor"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ActorIsA" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="noSelfLoop" value="self.parent &lt;> self.child"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="noSelfLoop"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parent" lowerBound="1"
+        eType="#//Actor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="child" lowerBound="1" eType="#//Actor"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ParticipatesIn" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="noSelfLoop" value="self.inner &lt;> self.outer"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="noSelfLoop"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inner" lowerBound="1" eType="#//Actor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outer" lowerBound="1" eType="#//Actor"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IntentionalElement" abstract="true"
+      eSuperTypes="#//GStarNode">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="mustBeWanted exactlyOneOwner"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="mustBeWanted" value="gstar::Wants.allInstances()->exists(w | w.element = self)"/>
+      <details key="exactlyOneOwner" value="gstar::Wants.allInstances()->select(w | w.element = self)->size() = 1"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="spec" eType="#//Query"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="GoalTaskElement" abstract="true" eSuperTypes="#//IntentionalElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Goal" eSuperTypes="#//GoalTaskElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="mustHaveSpec"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="mustHaveSpec" value="not self.spec.oclIsUndefined() and not self.spec.expr.oclIsUndefined()"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="mode" eType="#//GoalMode"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Task" eSuperTypes="#//GoalTaskElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Operation" eSuperTypes="#//Task">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="operationHasPrePost"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="operationHasPrePost" value="not self.preCondition.oclIsUndefined() and not self.postCondition.oclIsUndefined()"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="preCondition" eType="#//Query"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="postCondition" eType="#//Query"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="modifies" upperBound="-1"
+        eType="#//ModTarget" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Resource" eSuperTypes="#//IntentionalElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="resourceType" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Quality" eSuperTypes="#//IntentionalElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="mustHaveSpec"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="mustHaveSpec" value="not self.spec.oclIsUndefined() and not self.spec.expr.oclIsUndefined()"/>
+    </eAnnotations>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DomainAssumption" eSuperTypes="#//IntentionalElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="mustHaveSpec"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="mustHaveSpec" value="not self.spec.oclIsUndefined() and not self.spec.expr.oclIsUndefined()"/>
+    </eAnnotations>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Obstacle" eSuperTypes="#//IntentionalElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="mustHaveSpec"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="mustHaveSpec" value="not self.spec.oclIsUndefined() and not self.spec.expr.oclIsUndefined()"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="severity" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Wants" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="operationOwnedBySystem"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="operationOwnedBySystem" value="not self.element.oclIsKindOf(Operation) or self.actor.isEnv = false"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actor" lowerBound="1" eType="#//Actor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="element" lowerBound="1"
+        eType="#//IntentionalElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Contribution" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="onlyContributionToQuality sameOwnerForContribution"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="onlyContributionToQuality" value="self.target.oclIsKindOf(Quality)"/>
+      <details key="sameOwnerForContribution" value="gstar::Wants.allInstances()->any(w | w.element = self.source).actor = gstar::Wants.allInstances()->any(w | w.element = self.target).actor"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="polarity" eType="#//ContributionPolarity"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" lowerBound="1"
+        eType="#//IntentionalElement"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" lowerBound="1"
+        eType="#//IntentionalElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NeededBy" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="sameOwnerForNeededBy userMustBeTask"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="sameOwnerForNeededBy" value="gstar::Wants.allInstances()->any(w | w.element = self.resource).actor = gstar::Wants.allInstances()->any(w | w.element = self.user).actor"/>
+      <details key="userMustBeTask" value="self.user.oclIsKindOf(Task)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="resource" lowerBound="1"
+        eType="#//Resource"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="user" lowerBound="1" eType="#//GoalTaskElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Qualifies" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="qualifiedType sameOwnerForQualifies noParallelContribution"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="qualifiedType" value="self.qualified.oclIsKindOf(Goal) or self.qualified.oclIsKindOf(Task) or self.qualified.oclIsKindOf(Resource)"/>
+      <details key="sameOwnerForQualifies" value="gstar::Wants.allInstances()->any(w | w.element = self.quality).actor = gstar::Wants.allInstances()->any(w | w.element = self.qualified).actor"/>
+      <details key="noParallelContribution" value="not gstar::Contribution.allInstances()->exists(c |  c.source = self.qualified and c.target = self.quality ) "/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="quality" lowerBound="1"
+        eType="#//Quality"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="qualified" lowerBound="1"
+        eType="#//IntentionalElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Dependency" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="distinctActors dependerElmtOwnedByDepender dependeeElmtOwnedByDependee dependumOwnedByDependee"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="distinctActors" value="self.depender &lt;> self.dependee"/>
+      <details key="dependerElmtOwnedByDepender" value="self.dependerElmt.oclIsUndefined() or Wants.allInstances()->exists(w | w.actor = self.depender and w.element = self.dependerElmt)"/>
+      <details key="dependeeElmtOwnedByDependee" value="self.dependeeElmt.oclIsUndefined() or Wants.allInstances()->exists(w | w.actor = self.dependee and w.element = self.dependeeElmt)"/>
+      <details key="dependumOwnedByDependee" value="Wants.allInstances()->exists(w | w.actor = self.dependee and w.element = self.dependum)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="depender" lowerBound="1"
+        eType="#//Actor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependee" lowerBound="1"
+        eType="#//Actor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependum" lowerBound="1"
+        eType="#//IntentionalElement"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependerElmt" eType="#//IntentionalElement"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="dependeeElmt" eType="#//IntentionalElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Refinement" abstract="true" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="minChildren noSelfInChildren childrenUnique sameOwnerForRefinement"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="minChildren" value="self.children->size() >= 2"/>
+      <details key="noSelfInChildren" value="not self.children->includes(self.parent)"/>
+      <details key="childrenUnique" value="self.children->asSet()->size() = self.children->size()"/>
+      <details key="sameOwnerForRefinement" value="let a : gstar::Actor = gstar::Wants.allInstances()->any(w | w.element = self.parent).actor in self.children->forAll(c |  gstar::Wants.allInstances()->any(w | w.element = c).actor = a)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parent" lowerBound="1"
+        eType="#//GoalTaskElement"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="children" lowerBound="2"
+        upperBound="-1" eType="#//GoalTaskElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ANDRefinement" eSuperTypes="#//Refinement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ORRefinement" eSuperTypes="#//Refinement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Obstructs" eSuperTypes="#//GStarLink">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="notNullEnds noSelfLoop"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="noSelfLoop" value="self.obstacle &lt;> self.obstructed"/>
+      <details key="notNullEnds" value="not self.obstacle.oclIsUndefined() and not self.obstructed.oclIsUndefined()"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="obstacle" lowerBound="1"
+        eType="#//Obstacle"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="obstructed" lowerBound="1"
+        eType="#//IntentionalElement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="RelOpKind">
+    <eLiterals name="EQ" literal="EQ"/>
+    <eLiterals name="NEQ" value="1" literal="NEQ"/>
+    <eLiterals name="LT" value="2" literal="LT"/>
+    <eLiterals name="LE" value="3" literal="LE"/>
+    <eLiterals name="GT" value="4" literal="GT"/>
+    <eLiterals name="GE" value="5" literal="GE"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="LiteralType">
+    <eLiterals name="BOOL" literal="BOOL"/>
+    <eLiterals name="INT" value="1" literal="INT"/>
+    <eLiterals name="STRING" value="2" literal="STRING"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Query" eSuperTypes="#//GStarElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="exprRequired" value="not self.expr.oclIsUndefined()"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="exprRequired"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="snapshot" eType="#//Snapshot"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expr" eType="#//Expr" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Snapshot" eSuperTypes="#//GStarElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="uniqueObjVarNames" value="self.objVars->isUnique(v | v.varName)"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="uniqueObjVarNames"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="objVars" upperBound="-1"
+        eType="#//ObjVar" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ObjVar" eSuperTypes="#//GStarElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="varName" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Expr" abstract="true" eSuperTypes="#//GStarElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="UnaryExpr" abstract="true" eSuperTypes="#//Expr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="operand" lowerBound="1"
+        eType="#//Expr" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BinaryExpr" abstract="true" eSuperTypes="#//Expr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" lowerBound="1" eType="#//Expr"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="right" lowerBound="1" eType="#//Expr"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="And" eSuperTypes="#//BinaryExpr"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Or" eSuperTypes="#//BinaryExpr"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Implies" eSuperTypes="#//BinaryExpr"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Not" eSuperTypes="#//UnaryExpr"/>
+  <eClassifiers xsi:type="ecore:EClass" name="RelOp" eSuperTypes="#//BinaryExpr">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="op" lowerBound="1" eType="#//RelOpKind"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="VarRef" eSuperTypes="#//Expr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="var" lowerBound="1" eType="#//ObjVar"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isPrime" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AttrRef" eSuperTypes="#//Expr">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="var" lowerBound="1" eType="#//ObjVar"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="attr" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isPrime" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Const" eSuperTypes="#//Expr">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" lowerBound="1" eType="#//LiteralType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="literal" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ModTarget" eSuperTypes="#//GStarElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="var" lowerBound="1" eType="#//ObjVar"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="attr" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TemporalKind">
+    <eLiterals name="INVARIANCE"/>
+    <eLiterals name="EVENTUALITY" value="1"/>
+    <eLiterals name="RESPONSE" value="2"/>
+    <eLiterals name="PRECEDENCE" value="3"/>
+    <eLiterals name="ABSENCE" value="4"/>
+    <eLiterals name="ASSUMPTION" value="5"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TemporalScope">
+    <eLiterals name="GLOBAL"/>
+    <eLiterals name="BEFORE" value="1"/>
+    <eLiterals name="AFTER" value="2"/>
+    <eLiterals name="BETWEEN" value="3"/>
+    <eLiterals name="AFTER_UNTIL" value="4"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TemporalRole">
+    <eLiterals name="DEFINES"/>
+    <eLiterals name="CONSTRAINS" value="1"/>
+    <eLiterals name="OPERATIONALIZES" value="2"/>
+    <eLiterals name="MITIGATES" value="3"/>
+    <eLiterals name="ASSUMES" value="4"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TemporalVariableKind">
+    <eLiterals name="INPUT"/>
+    <eLiterals name="OUTPUT" value="1"/>
+    <eLiterals name="INTERNAL" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TemporalVariable" eSuperTypes="#//GStarElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" lowerBound="1" eType="#//TemporalVariableKind"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dataType" lowerBound="1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="binding" eType="#//Query"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TemporalRequirement" eSuperTypes="#//GStarElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="mustHaveCorePredicate triggerResponseShape stateShape scopeNeedsUntil"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL">
+      <details key="mustHaveCorePredicate" value="not self.statePredicate.oclIsUndefined() or not self.response.oclIsUndefined()"/>
+      <details key="triggerResponseShape" value="(self.kind = TemporalKind::RESPONSE or self.kind = TemporalKind::PRECEDENCE) implies (not self.trigger.oclIsUndefined() and not self.response.oclIsUndefined())"/>
+      <details key="stateShape" value="(self.kind = TemporalKind::INVARIANCE or self.kind = TemporalKind::ABSENCE or self.kind = TemporalKind::ASSUMPTION) implies not self.statePredicate.oclIsUndefined()"/>
+      <details key="scopeNeedsUntil" value="(self.scope = TemporalScope::BETWEEN or self.scope = TemporalScope::AFTER_UNTIL) implies not self.until.oclIsUndefined()"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" lowerBound="1" eType="#//TemporalKind"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="scope" lowerBound="1" eType="#//TemporalScope"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="pattern" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="component" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="formalism" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        defaultValueLiteral="SpecPro"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="fretishText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ltlText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="trigger" eType="#//Query"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="response" eType="#//Query"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="statePredicate" eType="#//Query"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="until" eType="#//Query"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="variables" upperBound="-1"
+        eType="#//TemporalVariable"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TemporalLink" eSuperTypes="#//GStarLink">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="role" lowerBound="1" eType="#//TemporalRole"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" lowerBound="1"
+        eType="#//IntentionalElement"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="requirement" lowerBound="1"
+        eType="#//TemporalRequirement"/>
+  </eClassifiers>
+</ecore:EPackage>
