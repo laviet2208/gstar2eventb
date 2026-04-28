@@ -1,0 +1,52 @@
+[module generate_ltl('http://example.org/gstar')/]
+
+[template public generate(model : GStarModel) @main]
+[file ('temporal_requirements.ltl', false, 'UTF-8')]
+[for (requirement : TemporalRequirement | model.temporalRequirements)]
+[requirement.effectiveName()/]: [requirement.toLTL()/]
+[/for]
+[/file]
+[file ('temporal_variables.props', false, 'UTF-8')]
+[for (variable : TemporalVariable | model.temporalVariables)]
+[variable.effectiveName()/] = [variable.toAtomicProposition()/]
+[/for]
+[/file]
+[file ('temporal_traceability.csv', false, 'UTF-8')]
+requirement,role,source
+[for (link : TemporalLink | model.temporalLinks)]
+[link.requirement.effectiveName()/],[link.role.toString()/],[link.source.effectiveName()/]
+[/for]
+[/file]
+[/template]
+
+[query private effectiveName(element : GStarElement) : String = if not element.id.oclIsUndefined() and element.id <> '' then element.id else if not element.name.oclIsUndefined() and element.name <> '' then element.name else 'unnamed' endif endif/]
+
+[query private toAtomicProposition(variable : TemporalVariable) : String = if not variable.binding.oclIsUndefined() then variable.binding.toPredicate() else variable.effectiveName() endif/]
+
+[query private toLTL(requirement : TemporalRequirement) : String = if not requirement.ltlText.oclIsUndefined() and requirement.ltlText <> '' then requirement.ltlText else requirement.buildLTLFromKind().applyScope(requirement) endif/]
+
+[query private buildLTLFromKind(requirement : TemporalRequirement) : String = if requirement.kind = TemporalKind::EVENTUALITY then 'F('.concat(requirement.mainPredicate()).concat(')') else if requirement.kind = TemporalKind::RESPONSE then 'G(('.concat(requirement.triggerPredicate()).concat(') -> F(').concat(requirement.responsePredicate()).concat('))') else if requirement.kind = TemporalKind::PRECEDENCE then '(!('.concat(requirement.responsePredicate()).concat(')) U (').concat(requirement.triggerPredicate()).concat(')') else if requirement.kind = TemporalKind::INVARIANCE then 'G('.concat(requirement.statePredicateText()).concat(')') else if requirement.kind = TemporalKind::ABSENCE then 'G(!('.concat(requirement.statePredicateText()).concat('))') else if requirement.kind = TemporalKind::ASSUMPTION then 'G('.concat(requirement.statePredicateText()).concat(')') else requirement.mainPredicate() endif endif endif endif endif endif/]
+
+[query private applyScope(formula : String, requirement : TemporalRequirement) : String = if requirement.scope = TemporalScope::GLOBAL then formula else if requirement.scope = TemporalScope::AFTER and not requirement.trigger.oclIsUndefined() then 'G(('.concat(requirement.triggerPredicate()).concat(') -> (').concat(formula).concat('))') else if requirement.scope = TemporalScope::BEFORE and not requirement.until.oclIsUndefined() then '('.concat(formula).concat(') U (').concat(requirement.untilPredicate()).concat(')') else if requirement.scope = TemporalScope::BETWEEN and not requirement.trigger.oclIsUndefined() and not requirement.until.oclIsUndefined() then 'G(('.concat(requirement.triggerPredicate()).concat(') -> (').concat(formula).concat(' U ').concat(requirement.untilPredicate()).concat('))') else if requirement.scope = TemporalScope::AFTER_UNTIL and not requirement.trigger.oclIsUndefined() and not requirement.until.oclIsUndefined() then 'G(('.concat(requirement.triggerPredicate()).concat(') -> (').concat(formula).concat(' U ').concat(requirement.untilPredicate()).concat('))') else formula endif endif endif endif endif/]
+
+[query private mainPredicate(requirement : TemporalRequirement) : String = if not requirement.response.oclIsUndefined() then requirement.response.toPredicate() else requirement.statePredicateText() endif/]
+
+[query private triggerPredicate(requirement : TemporalRequirement) : String = if requirement.trigger.oclIsUndefined() then 'TRUE' else requirement.trigger.toPredicate() endif/]
+
+[query private responsePredicate(requirement : TemporalRequirement) : String = if requirement.response.oclIsUndefined() then requirement.statePredicateText() else requirement.response.toPredicate() endif/]
+
+[query private statePredicateText(requirement : TemporalRequirement) : String = if requirement.statePredicate.oclIsUndefined() then if not requirement.response.oclIsUndefined() then requirement.response.toPredicate() else 'TRUE' endif else requirement.statePredicate.toPredicate() endif/]
+
+[query private untilPredicate(requirement : TemporalRequirement) : String = if requirement.until.oclIsUndefined() then 'TRUE' else requirement.until.toPredicate() endif/]
+
+[query private toPredicate(query : Query) : String = if query.oclIsUndefined() or query.expr.oclIsUndefined() then 'TRUE' else query.expr.toPredicate() endif/]
+
+[query private toPredicate(expr : Expr) : String = if expr.oclIsKindOf(And) then '('.concat(expr.oclAsType(And).left.toPredicate()).concat(' & ').concat(expr.oclAsType(And).right.toPredicate()).concat(')') else if expr.oclIsKindOf(Or) then '('.concat(expr.oclAsType(Or).left.toPredicate()).concat(' | ').concat(expr.oclAsType(Or).right.toPredicate()).concat(')') else if expr.oclIsKindOf(Implies) then '('.concat(expr.oclAsType(Implies).left.toPredicate()).concat(' -> ').concat(expr.oclAsType(Implies).right.toPredicate()).concat(')') else if expr.oclIsKindOf(Not) then '!('.concat(expr.oclAsType(Not).operand.toPredicate()).concat(')') else if expr.oclIsKindOf(RelOp) then expr.oclAsType(RelOp).left.toPredicate().concat(' ').concat(expr.oclAsType(RelOp).operatorText()).concat(' ').concat(expr.oclAsType(RelOp).right.toPredicate()) else if expr.oclIsKindOf(VarRef) then expr.oclAsType(VarRef).variableText() else if expr.oclIsKindOf(AttrRef) then expr.oclAsType(AttrRef).attributeText() else if expr.oclIsKindOf(Const) then expr.oclAsType(Const).literalText() else 'TRUE' endif endif endif endif endif endif endif endif/]
+
+[query private operatorText(expr : RelOp) : String = if expr.op = RelOpKind::EQ then '=' else if expr.op = RelOpKind::NEQ then '!=' else if expr.op = RelOpKind::LT then '<' else if expr.op = RelOpKind::LE then '<=' else if expr.op = RelOpKind::GT then '>' else if expr.op = RelOpKind::GE then '>=' else '=' endif endif endif endif endif endif/]
+
+[query private variableText(expr : VarRef) : String = if expr.isPrime then expr.var.varName.concat("'") else expr.var.varName endif/]
+
+[query private attributeText(expr : AttrRef) : String = if expr.isPrime then expr.var.varName.concat('_').concat(expr.attr).concat("'") else expr.var.varName.concat('_').concat(expr.attr) endif/]
+
+[query private literalText(expr : Const) : String = if expr.type = LiteralType::STRING then expr.literal else if expr.type = LiteralType::BOOL then expr.literal else expr.literal endif endif/]
