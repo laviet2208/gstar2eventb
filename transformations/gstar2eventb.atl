@@ -1,0 +1,305 @@
+module gstar2eventb;
+create OUT : EB from IN : GSR;
+uses helper;
+
+rule GStarModel2Project {
+    from
+        s : GSR!GStarModel
+    to
+        project : EB!Project (
+            name <- s.projectName,
+            contexts <- Sequence { thisModule.resolveTemp(s, 'context') },
+            machines <- GSR!Actor.allInstances()
+                ->select(a | a.isSystemActor)
+                ->collect(a | thisModule.resolveTemp(a, 'machine'))
+                ->asSequence()
+        ),
+        context : EB!Context (
+            name <- s.contextName,
+            constants <- GSR!Resource.allInstances()
+                ->collect(r | thisModule.resolveTemp(r, 'constant'))
+                ->union(
+                    GSR!TemporalVariable.allInstances()
+                        ->collect(tv | thisModule.resolveTemp(tv, 'constant'))
+                )
+                ->asSequence(),
+            axioms <- GSR!DomainAssumption.allInstances()
+                ->select(d | d.isStaticAssumption)
+                ->collect(d | thisModule.resolveTemp(d, 'axiom'))
+                ->union(
+                    GSR!Resource.allInstances()
+                        ->collect(r | thisModule.resolveTemp(r, 'typeAxiom'))
+                )
+                ->union(
+                    GSR!TemporalVariable.allInstances()
+                        ->collect(tv | thisModule.resolveTemp(tv, 'typeAxiom'))
+                )
+                ->asSequence()
+        )
+}
+
+rule SystemActor2Machine {
+    from
+        s : GSR!Actor (s.isSystemActor)
+    to
+        machine : EB!Machine (
+            name <- s.machineName,
+            sees <- Sequence { thisModule.resolveTemp(thisModule.rootModel, 'context') },
+            variables <- s.ownedAchieveGoals
+                ->collect(g | thisModule.resolveTemp(g, 'variable'))
+                ->union(
+                    s.ownedOperations
+                        ->collect(o | thisModule.resolveTemp(o, 'statusVariable'))
+                )
+                ->union(
+                    GSR!TemporalVariable.allInstances()
+                        ->select(tv | tv.requiresStateVariable)
+                        ->collect(tv | thisModule.resolveTemp(tv, 'variable'))
+                )
+                ->asSequence(),
+            invariants <- s.ownedMaintainGoals
+                ->collect(g | thisModule.resolveTemp(g, 'invariant'))
+                ->union(
+                    s.ownedAchieveGoals
+                        ->collect(g | thisModule.resolveTemp(g, 'typingInvariant'))
+                )
+                ->union(
+                    s.ownedOperations
+                        ->collect(o | thisModule.resolveTemp(o, 'statusTypingInvariant'))
+                )
+                ->union(
+                    s.ownedDomainAssumptions
+                        ->select(d | not d.isStaticAssumption)
+                        ->collect(d | thisModule.resolveTemp(d, 'invariant'))
+                )
+                ->union(
+                    GSR!TemporalVariable.allInstances()
+                        ->select(tv | tv.requiresStateVariable)
+                        ->collect(tv | thisModule.resolveTemp(tv, 'typingInvariant'))
+                )
+                ->union(
+                    GSR!Dependency.allInstances()
+                        ->select(d | d.isRelevantToActor(s))
+                        ->collect(d | thisModule.resolveTemp(d, 'invariant'))
+                )
+                ->union(
+                    GSR!Refinement.allInstances()
+                        ->select(r | r.isRelevantToActor(s))
+                        ->collect(r | thisModule.resolveTemp(r, 'invariant'))
+                )
+                ->asSequence(),
+            events <- s.ownedOperations
+                ->collect(o | thisModule.resolveTemp(o, 'event'))
+                ->union(
+                    s.ownedObstacles
+                        ->collect(ob | thisModule.resolveTemp(ob, 'handlingEvent'))
+                )
+                ->union(
+                    s.environmentDependencies
+                        ->collect(d | thisModule.resolveTemp(d, 'event'))
+                )
+                ->asSequence()
+        )
+}
+
+rule Resource2Constant {
+    from
+        s : GSR!Resource
+    to
+        constant : EB!Constant (
+            name <- s.constantName
+        ),
+        typeAxiom : EB!Axiom (
+            name <- s.typeAxiomName,
+            predicate <- s.resourceAxiomPredicate
+        )
+}
+
+rule TemporalVariable2ConstantAndStateVariable {
+    from
+        s : GSR!TemporalVariable
+    to
+        constant : EB!Constant (
+            name <- s.constantName
+        ),
+        typeAxiom : EB!Axiom (
+            name <- s.contextTypingAxiomName,
+            predicate <- s.contextTypingPredicate
+        ),
+        variable : EB!Variable (
+            name <- s.variableName
+        ),
+        typingInvariant : EB!Invariant (
+            name <- s.machineTypingInvariantName,
+            predicate <- s.machineTypingPredicate
+        )
+}
+
+rule MaintainGoal2Invariant {
+    from
+        s : GSR!Goal (s.isMaintainGoal)
+    to
+        invariant : EB!Invariant (
+            name <- s.invariantName,
+            predicate <- s.goalPredicate
+        )
+}
+
+rule AchieveGoal2StateVariable {
+    from
+        s : GSR!Goal (s.isAchieveGoal)
+    to
+        variable : EB!Variable (
+            name <- s.variableName
+        ),
+        typingInvariant : EB!Invariant (
+            name <- s.typingInvariantName,
+            predicate <- s.booleanTypingPredicate
+        )
+}
+
+rule DomainAssumption2ContextAxiom {
+    from
+        s : GSR!DomainAssumption (s.isStaticAssumption)
+    to
+        axiom : EB!Axiom (
+            name <- s.axiomName,
+            predicate <- s.assumptionPredicate
+        )
+}
+
+rule DomainAssumption2MachineInvariant {
+    from
+        s : GSR!DomainAssumption (not s.isStaticAssumption)
+    to
+        invariant : EB!Invariant (
+            name <- s.invariantName,
+            predicate <- s.assumptionPredicate
+        )
+}
+
+rule Dependency2Invariant {
+    from
+        s : GSR!Dependency
+    to
+        invariant : EB!Invariant (
+            name <- s.invariantName,
+            predicate <- s.dependencyPredicate
+        )
+}
+
+rule Refinement2Invariant {
+    from
+        s : GSR!Refinement
+    to
+        invariant : EB!Invariant (
+            name <- s.invariantName,
+            predicate <- s.refinementPredicate
+        )
+}
+
+rule Operation2Event {
+    from
+        s : GSR!Operation
+    to
+        event : EB!Event (
+            name <- s.eventName,
+            guards <- Sequence { preconditionGuard }
+                ->union(
+                    s.relatedDomainAssumptions
+                        ->collect(d | thisModule.resolveTemp(d, 'guard'))
+                )
+                ->union(
+                    s.relatedObstacles
+                        ->collect(o | thisModule.resolveTemp(o, 'hinderingGuard'))
+                )
+                ->asSequence(),
+            actions <- Sequence { postconditionAction, statusAction }
+                ->union(
+                    s.modifies
+                        ->collect(m | thisModule.resolveTemp(m, 'action'))
+                )
+                ->asSequence()
+        ),
+        preconditionGuard : EB!Guard (
+            name <- s.guardName,
+            predicate <- s.preconditionPredicate
+        ),
+        postconditionAction : EB!Action (
+            name <- s.actionName,
+            assignment <- s.postconditionAssignment
+        ),
+        statusVariable : EB!Variable (
+            name <- s.statusVariableName
+        ),
+        statusTypingInvariant : EB!Invariant (
+            name <- s.statusTypingInvariantName,
+            predicate <- s.statusTypingPredicate
+        ),
+        statusAction : EB!Action (
+            name <- s.statusActionName,
+            assignment <- s.statusAssignment
+        )
+}
+
+rule ModTarget2Action {
+    from
+        s : GSR!ModTarget
+    to
+        action : EB!Action (
+            name <- s.actionName,
+            assignment <- s.assignmentText
+        )
+}
+
+rule DomainAssumption2Guard {
+    from
+        s : GSR!DomainAssumption
+    to
+        guard : EB!Guard (
+            name <- s.guardName,
+            predicate <- s.assumptionPredicate
+        )
+}
+
+rule Obstacle2HinderingGuardAndHandlingEvent {
+    from
+        s : GSR!Obstacle
+    to
+        hinderingGuard : EB!Guard (
+            name <- s.hinderingGuardName,
+            predicate <- s.negatedObstaclePredicate
+        ),
+        handlingEvent : EB!Event (
+            name <- s.handlingEventName,
+            guards <- Sequence { occurrenceGuard },
+            actions <- Sequence { handlingAction }
+        ),
+        occurrenceGuard : EB!Guard (
+            name <- s.occurrenceGuardName,
+            predicate <- s.obstaclePredicate
+        ),
+        handlingAction : EB!Action (
+            name <- s.handlingActionName,
+            assignment <- s.handlingAssignment
+        )
+}
+
+rule EnvironmentDependency2Event {
+    from
+        s : GSR!Dependency (s.dependee.isEnvironmentActor)
+    to
+        event : EB!Event (
+            name <- s.environmentEventName,
+            guards <- Sequence { dependencyGuard },
+            actions <- Sequence { dependencyAction }
+        ),
+        dependencyGuard : EB!Guard (
+            name <- s.environmentGuardName,
+            predicate <- s.environmentGuardPredicate
+        ),
+        dependencyAction : EB!Action (
+            name <- s.environmentActionName,
+            assignment <- s.environmentActionAssignment
+        )
+}
