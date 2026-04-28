@@ -1,0 +1,83 @@
+[module generate_eventb('http://example.org/eventb')/]
+
+[template public generate(project : Project) @main]
+[for (context : Context | project.contexts)]
+[emitContext(context)/]
+[/for]
+[for (machine : Machine | project.machines)]
+[emitMachine(machine)/]
+[/for]
+[/template]
+
+[template private emitContext(context : Context)]
+[file (context.name.concat('.buc'), false, 'UTF-8')]
+CONTEXT [context.name/]
+[if context.constants->notEmpty()]
+CONSTANTS
+[for (constant : Constant | context.constants)]    [constant.name/][if constant <> context.constants->last()];[/if]
+[/for]
+[/if]
+[if context.axioms->notEmpty()]
+AXIOMS
+[for (axiom : Axiom | context.axioms)]    [axiom.name/]: [axiom.effectivePredicate()/]
+[/for]
+[/if]
+END
+[/file]
+[/template]
+
+[template private emitMachine(machine : Machine)]
+[file (machine.name.concat('.bum'), false, 'UTF-8')]
+MACHINE [machine.name/]
+[if machine.sees->notEmpty()]
+SEES [for (context : Context | machine.sees)][context.name/][if context <> machine.sees->last()], [/if][/for]
+[/if]
+[if machine.variables->notEmpty()]
+VARIABLES
+[for (variable : Variable | machine.variables)]    [variable.name/][if variable <> machine.variables->last()],[/if]
+[/for]
+[/if]
+[if machine.invariants->notEmpty()]
+INVARIANTS
+[for (invariant : Invariant | machine.invariants)]    [invariant.name/]: [invariant.effectivePredicate()/]
+[/for]
+[/if]
+EVENTS
+[if not machine.hasInitialisationEvent()]
+    INITIALISATION
+    THEN
+[if machine.variables->isEmpty()]        act_init: skip
+[else][for (variable : Variable | machine.variables)]        act_init_[variable.name/]: [variable.name/] :∈ [variable.initialDomain(machine)/][if variable <> machine.variables->last()] ||[/if]
+[/for][/if]    END
+
+[/if][for (event : Event | machine.events)]
+[event.renderEvent()/]
+[/for]END
+[/file]
+[/template]
+
+[template private renderEvent(event : Event)]
+[if event.isInitialisation()]    INITIALISATION
+[else]    EVENT [event.name/]
+[/if][if event.guards->notEmpty()]    WHERE
+[for (guard : Guard | event.guards)]        [guard.name/]: [guard.effectivePredicate()/]
+[/for][/if]    THEN
+[if event.actions->notEmpty()][for (action : Action | event.actions)]        [action.name/]: [action.effectiveAssignment()/][if action <> event.actions->last()] ||[/if]
+[/for][else]        act_skip: skip
+[/if]    END
+
+[/template]
+
+[query private effectivePredicate(axiom : Axiom) : String = if axiom.predicate.oclIsUndefined() or axiom.predicate = '' then 'TRUE' else axiom.predicate endif/]
+
+[query private effectivePredicate(invariant : Invariant) : String = if invariant.predicate.oclIsUndefined() or invariant.predicate = '' then 'TRUE' else invariant.predicate endif/]
+
+[query private effectivePredicate(guard : Guard) : String = if guard.predicate.oclIsUndefined() or guard.predicate = '' then 'TRUE' else guard.predicate endif/]
+
+[query private effectiveAssignment(action : Action) : String = if action.assignment.oclIsUndefined() or action.assignment = '' then 'skip' else action.assignment endif/]
+
+[query private isInitialisation(event : Event) : Boolean = event.name = 'INITIALISATION' or event.name = 'Initialisation' or event.name = 'initialisation'/]
+
+[query private hasInitialisationEvent(machine : Machine) : Boolean = machine.events->exists(event | event.isInitialisation())/]
+
+[query private initialDomain(variable : Variable, machine : Machine) : String = if machine.invariants->exists(invariant | invariant.effectivePredicate().startsWith(variable.name.concat(' : '))) then machine.invariants->any(invariant | invariant.effectivePredicate().startsWith(variable.name.concat(' : '))).effectivePredicate().substring(variable.name.size() + 4, machine.invariants->any(invariant | invariant.effectivePredicate().startsWith(variable.name.concat(' : '))).effectivePredicate().size()) else if machine.invariants->exists(invariant | invariant.effectivePredicate().startsWith(variable.name.concat(' \\in '))) then machine.invariants->any(invariant | invariant.effectivePredicate().startsWith(variable.name.concat(' \\in '))).effectivePredicate().substring(variable.name.size() + 6, machine.invariants->any(invariant | invariant.effectivePredicate().startsWith(variable.name.concat(' \\in '))).effectivePredicate().size()) else 'BOOL' endif endif/]
